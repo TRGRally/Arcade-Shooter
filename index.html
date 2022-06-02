@@ -1,0 +1,76 @@
+<!doctype html>
+<head>
+	<!--import font from google fonts-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> 
+  	<!--import css file-->
+  <link rel="stylesheet" href="index.css">
+  <title>ARCADE SHOOTER</title>
+</head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+</div> <!--create canvas-->
+<canvas id="canvas" style="position: absolute; user-select: none;"></canvas>
+
+  
+
+<!--PAUSE MENU-->
+<div id="paused" style="color: white;">
+	<div id="pausedText" style="color: white;">PAUSED</div>
+</div>
+
+<div id="HUD" style="color: white;">
+<!--HUD items-->
+	<div id = "HP" style="color: white; ">HP</div>
+	<progress id="healthBar" value="100" max="100"></progress>
+	<div id="fps" style="color: white;">FPS:</div>
+	<div id="score" style="color: white;">SCORE 0</div>
+	<div id="waves" style="color: white;">WAVE 0</div>
+</div>
+
+<div id ="titleScreen">
+<!--title screen items-->
+	<div id="playButton" style="color: white;">PLAY</div>
+	<form id="nameBlock">
+		<label for="name" id="nameLabel">NAME:</label>
+		<input id="name" type="search" autocomplete="off" spellcheck="false" autofocus="true" maxLength="8">
+	</form>
+	<div id="gameTitle" style="color: white;">ARCADE SHOOTER</div>
+	<div id="scoresButton" style="color: white;">SCORES</div>
+	<img id="optionsButton" src="./images/options.png" alt="options" width="100" height="100">
+</div>
+
+<div id ="optionsScreen">
+<!--options screen items-->
+	<div id="optionsText" style="color: white;">OPTIONS</div>
+	<input id="soundEffectsVolume" type="range" min="0" max="100" value="60" class="slider">
+	<div id="soundEffectsVolumeText" style="color: white;">SFX Volume</div>
+	<input id="musicVolume" type="range" min="0" max="100" value="60" class="slider">
+	<div id="musicVolumeText" style="color: white;">Music Volume</div>
+	<div id="optionsBackButton" style="color: white;">BACK</div>
+</div>
+
+<div id ="scoresScreen">
+<!--scores screen items-->
+	<div id="scoresBackButton" style="color: white;">BACK</div>
+	<div id="scoreBoardRank" style="color: white;"><span class='bold'>RANK</span><br><br>1<br><br>2<br><br>3<br><br>4<br><br>5</div>
+	<div id="scoreBoardPlayer" style="color: white;">PLAYER</div>
+	<div id="scoreBoardScore" style="color: white;">SCORE</div>
+	<div id="scoresText" style="color: white;">SCOREBOARD</div>
+</div>
+
+<div id="gameOverScreen" style="color: white;">
+<!--game over screen items-->
+	<div id="gameOver" style="color: white;">GAME OVER</div>
+	<div id="gameOverScoreBoardRank" style="color: white;"><span class='bold'>RANK</span><br><br>1<br><br>2<br><br>3<br><br>4<br><br>5</div>
+	<div id="gameOverScoreBoardPlayer" style="color: white;">PLAYER</div>
+	<div id="gameOverScoreBoardScore" style="color: white;">SCORE</div>
+	<div id="returnToMenu" style="color: white;">RETURN TO MENU</div>
+</div>
+
+<!--link to javascript file-->
+<script src="./index.js"></script>

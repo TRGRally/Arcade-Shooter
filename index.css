@@ -1,0 +1,423 @@
+body { /* set universal styles */
+    margin: 0;
+    color: white;
+    user-select: none; 
+    font-family: 'Roboto Mono', monospace;
+}
+
+#HUD {
+    display: grid;
+    position: relative;
+    align-items: center;
+    justify-items: center;
+    font-size: 60px;
+    text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8); /* GLOW */
+    grid-template-areas:
+        "topleft topmiddle topright"; /* HUD layout */
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 2%; /* move HUD away from screen edges */
+    gap: 3%;
+}
+
+#healthBar {
+    position: absolute;
+    width: 35%;
+    height: 50%;
+    bottom: 23%;
+    border: 2px solid white;
+    border-radius: 4px;
+    grid-area: topleft;
+}
+
+#healthBar::-webkit-progress-value { /* specifically the moving bar on the progress bar */
+    background: rgb(255, 63, 63);
+    border-radius: 2px;
+}
+
+#healthBar::-webkit-progress-bar { /* specifically the box which contains the moving bar */
+    background: rgb(26,25,23);
+    box-shadow: 0px 0px 11px -2px rgba(255, 255, 255, 1), 
+                inset 0px 0px 11px -3px rgba(255, 255, 255, 0.3); 
+  
+}
+
+#HP {
+    position: relative;
+    grid-area: topleft;
+    justify-self: start;
+    left: 12%
+}
+
+#score {
+    grid-area: topright;
+}
+
+#waves {
+    grid-area: topmiddle;
+}
+
+#fps {
+    font-size: 15px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+/* PAUSE MENU BELOW */
+
+#paused {
+    display: grid;
+    grid-template-areas:
+        "topleft top topright"
+        "midleft middle middleright"
+        "bottomleft bottom bottomright";
+    align-items: center;
+    justify-items: center;
+    vertical-align: middle;
+    height: 100vh;
+    grid-template-columns: 1fr 4fr 1fr;
+    grid-template-rows: 1fr 4fr 1fr;
+    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
+}
+
+#pausedText {
+    position: relative;
+    display: grid;
+    color: white;
+    font-size: 100px;
+    grid-area: middle;
+}
+
+/* TITLE SCREEN BELOW */
+
+#titleScreen {
+    display: grid;
+    grid-template-areas: /* title screen layout */
+        "topleft top topright"
+        "midleft middle middleright"
+        "bottomleft bottom bottomright";
+    align-items: center;
+    justify-items: center;
+    vertical-align: middle;
+    height: 100vh;
+    grid-template-columns: 1fr 4fr 1fr;
+    grid-template-rows: 1fr 4fr 1fr;
+    box-shadow: 0px 0px 8px rgba(200, 200, 200, 0.8); /* GLOW FOR BUTTONS */
+    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
+}
+
+#gameTitle {
+    font-size: 110px;
+    position: relative;
+    padding: 10px;
+    text-decoration: none;
+    text-align: middle;
+    vertical-align: bottom;
+    color: white;
+    grid-area: top;
+}
+
+#playButton {
+    font-size: 70px;
+    position: relative;
+    padding-top: 0px;
+    padding-right: 10px;
+    padding-bottom: 0px;
+    padding-left: 10px;
+    text-decoration: none;
+    text-align: middle;
+    color: white;
+    border: solid grey 2px;
+    border-radius: 12px;
+    grid-area: middle;
+    top: 10px;
+}
+
+#scoresButton {
+    font-size: 60px;
+    position: relative;
+    padding-top: 0px;
+    padding-right: 10px;
+    padding-bottom: 0px;
+    padding-left: 10px;
+    text-decoration: none;
+    text-align: middle;
+    color: whitesmoke;
+    border: solid grey 2px;
+    background-color: rbga(255,255,255, 1);
+    border-radius: 12px;
+    grid-area: topleft;
+}
+
+#optionsButton {
+    position: relative;
+    grid-area: bottomleft;
+    border: solid grey 2px;
+    border-radius: 12px;
+}
+
+#nameBlock {
+    font-size: 45px;
+    background-color:rgba(255, 255, 255, 0);
+    position: relative;
+    padding: 10px;
+    text-align: middle;
+    vertical-align: bottom;
+    grid-area: bottom;
+    box-sizing: border-box;
+    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5);
+}
+
+#name {
+    font-size: 24px;
+    color: white;
+    font-family: 'Roboto Mono', monospace;
+    background-color:rgba(255, 255, 255, 0);
+    position: relative;
+    padding: 10px;
+    text-align: middle;
+    vertical-align: bottom;
+    grid-area: bottom;
+    border: solid grey 2px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
+}
+
+/* SCORES SCREEN BELOW */
+
+#scoresScreen {
+    display: none;
+    grid-template-areas: /* scores screen layout */
+        "topleft top top top topright"
+        "midleft rank player score middleright"
+        "bottomleft bottom bottom bottom botromright";
+    align-items: center;
+    justify-items: center;
+    vertical-align: top;
+    height: 100vh;
+    grid-template-columns: 1fr 2fr 2fr 2fr 1fr;
+    grid-template-rows: 1fr 5fr 1fr;
+    gap: 4%;
+    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
+}
+
+
+#scoreBoardRank {
+    position: relative;
+    font-size: 50px;
+    grid-area: rank;
+    justify-items: center;
+    text-align: top;
+    vertical-align: top;
+}
+
+#scoreBoardPlayer {
+    position: relative;
+    font-size: 50px;
+    grid-area: player;
+    justify-items: center;
+    text-align: top;
+    vertical-align: top;
+}
+
+#scoreBoardScore {
+    position: relative;
+    font-size: 50px;
+    grid-area: score;
+    justify-items: center;
+    text-align: top;
+    vertical-align: top;
+    align-items: top;
+}
+
+#scoresBackButton {
+    font-size: 50px;
+    position: relative;
+    padding-top: 0px;
+    padding-right: 10px;
+    padding-bottom: 0px;
+    padding-left: 10px;
+    text-align: middle;
+    vertical-align: middle;
+    color: white;
+    border: solid grey 2px;
+    border-radius: 12px;
+    grid-area: topleft;
+}
+
+#scoresText {
+    font-size: 80px;
+    padding: 10px;
+    position: relative;
+    text-align: middle;
+    vertical-align: middle;
+    color: white;
+    grid-area: top;
+}
+
+/* OPTIONS SCREEN BELOW */
+
+#optionsBackButton {
+    font-size: 50px;
+    position: relative;
+    padding-top: 0px;
+    padding-right: 10px;
+    padding-bottom: 0px;
+    padding-left: 10px;
+    text-align: middle;
+    vertical-align: middle;
+    color: white;
+    border: solid grey 2px;
+    border-radius: 12px;
+    grid-area: topleft;
+}
+
+#optionsScreen {
+    display: none;
+    grid-template-areas: /* options screen layout */
+        "topleft top top topright"
+        "midleft middle1 middle2 midright"
+        "midleft middle3 middle4 midright"
+        "bottomleft bottom bottom bottomright";
+    align-items: center;
+    justify-items: center;
+    vertical-align: middle;
+    height: 100vh;
+    grid-template-columns: 1fr 3fr 3fr 1fr;
+    grid-template-rows: 1fr 3fr 3fr 1fr;
+    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
+}
+
+#optionsText {
+    font-size: 80px;
+    position: relative;
+    padding: 10px;
+    text-align: middle;
+    vertical-align: middle;
+    color: white;
+    grid-area: top;
+}
+
+#soundEffectsVolume {
+    position: relative;
+    grid-area: middle2;
+}
+
+#soundEffectsVolumeText {
+    position: relative;
+    left: 15px;
+    grid-area: middle1;
+    font-size: 60px;
+}
+
+#musicVolume {
+    position: relative;
+    grid-area: middle4;
+}
+
+#musicVolumeText {
+    position: relative;
+    left: 15px;
+    grid-area: middle3;
+    font-size: 60px;
+}
+
+.slider { /* slider class for both sliders */
+    -webkit-appearance: none; /* remove default styling */
+    width: 100%;
+    height: 20px;
+    border-radius: 10px;
+    background: whitesmoke;
+    opacity: 0.7;
+}
+
+
+.slider::-webkit-slider-thumb { /* slider draggable part */
+    -webkit-appearance: none; /* remove default styling */
+    appearance: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: grey;
+}
+
+/* GAME OVER SCREEN BELOW */
+
+#gameOverScreen {
+    display: grid;
+    grid-template-areas: /* game over screen layout */
+    "topleft top top top topright"
+    "midleft rank player score midright"
+    "bottomleft bottom bottom bottom bottomright";
+    align-items: center;
+    justify-items: center;
+    vertical-align: middle;
+    height: 100vh;
+    grid-template-columns: 0.5fr 1fr 1fr 1fr 0.5fr;
+    grid-template-rows: 1fr 3fr 1fr;
+    box-shadow: 0px 0px 8px rgba(200, 200, 200, 0.8); /* GLOW FOR BUTTONS */
+    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
+}
+
+#gameOver {
+    position: relative;
+    font-size: 80px;
+    text-align: center;
+    vertical-align: middle;
+    grid-area: top;
+}
+
+#gameOverScoreBoardRank {
+    position: relative;
+    font-size: 40px;
+    grid-area: rank;
+    justify-items: center;
+    text-align: top;
+    vertical-align: top;
+}
+
+#gameOverScoreBoardPlayer {
+    position: relative;
+    font-size: 40px;
+    grid-area: player;
+    justify-items: center;
+    text-align: top;
+    vertical-align: top;
+}
+
+#gameOverScoreBoardScore {
+    position: relative;
+    font-size: 40px;
+    grid-area: score;
+    justify-items: center;
+    text-align: top;
+    vertical-align: top;
+    align-items: top;
+}
+
+#returnToMenu {
+    font-size: 60px;
+    position: relative;
+    padding-top: 0px;
+    padding-right: 10px;
+    padding-bottom: 0px;
+    padding-left: 10px;
+    text-align: middle;
+    vertical-align: middle;
+    color: white;
+    border: solid grey 2px;
+    border-radius: 12px;
+    grid-area: bottom;
+}
+
+/* CLASSES */
+
+.bold{
+    font-weight: bold
+}
+
+.red{
+    color: red;
+    text-shadow: 0px 0px 8px rgba(255, 0, 0, 0.5);
+}
