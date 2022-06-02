@@ -564,22 +564,32 @@ function gameplayLoop() {
 			document.getElementById("titleScreen").style.display = "grid"
 			document.getElementById("optionsScreen").style.display = "none"
 			document.getElementById("scoresScreen").style.display = "none"
+			document.getElementById("profileScreen").style.display = "none"
 
 		} else if (menuState === "scores") { //high scores screen
 			//set relevant HTML elements to visible or non-visible
 			document.getElementById("scoresScreen").style.display = "grid"
 			document.getElementById("optionsScreen").style.display = "none"
 			document.getElementById("titleScreen").style.display = "none"
+			document.getElementById("profileScreen").style.display = "none"
 
 		} else if (menuState === "options") { //options menu
 			//set relevant HTML elements to visible or non-visible
 			document.getElementById("optionsScreen").style.display = "grid"
 			document.getElementById("scoresScreen").style.display = "none"
 			document.getElementById("titleScreen").style.display = "none"
+			document.getElementById("profileScreen").style.display = "none"
 			//options slider logic
 			document.getElementById("soundEffectsVolumeText").innerHTML = "<span class='bold'>SFX Volume: </span>" + document.getElementById("soundEffectsVolume").value + "%"
 			document.getElementById("musicVolumeText").innerHTML = "<span class='bold'>Music Volume: </span>" + document.getElementById("musicVolume").value + "%"
 			musicValue = document.getElementById("musicVolume").value 
+		} else if (menuState === "profile") { //profile screen
+			//set relevant HTML elements to visible or non-visible
+			document.getElementById("profileScreen").style.display = "grid"
+			document.getElementById("scoresScreen").style.display = "none"
+			document.getElementById("optionsScreen").style.display = "none"
+			document.getElementById("titleScreen").style.display = "none"
+
 		}
 		//set relevant HTML elements to visible or non-visible
 		document.getElementById("paused").style.display = "none"
@@ -600,8 +610,8 @@ function gameplayLoop() {
 				getScores()
 				setTimeout(() => {
 						determineRank()
-				}, 100)
-			}, 100)
+				}, 200)
+			}, 200)
 			
 			
 		}
@@ -712,7 +722,9 @@ playButton.addEventListener("click", () => {
 
 function submitScore(){ //AJAX REQUEST: creates server POST request to store the player's score and name into the database
 	savedScore = true
-	var params = "name=" + player.name + "&" + "score=" + player.score //format player name and score for the POST request
+	let scoreDate = Date.now()
+	var params = "name=" + player.name + "&" + "score=" + player.score + "&" + "timestamp=" + scoreDate //format params for the POST request
+	console.log(params)
 	var request = new XMLHttpRequest() //create new request
 	request.open("POST", "submitScore.php", true) //set to POST request, call php file
 	request.setRequestHeader("Content-type", "application/x-www-form-urlencoded") //set request format
@@ -741,6 +753,7 @@ function getScores(){ //AJAX REQUEST: creates server GET request to retrieve the
 	request.onload = function(){
 		if(this.status == 200){ //200 = success code
 			scoreData = JSON.parse(this.responseText) //parse the JSON response and save to object
+			console.log(scoreData)
 			if (gameState === "title screen") { //if on title screen, show on scoreboard
 
 				document.getElementById("scoreBoardPlayer").innerHTML = "<span class='bold'>PLAYER</span>"
@@ -832,6 +845,21 @@ optionsBackButton.addEventListener("mouseout", () => {
 	optionsBackButton.style.border = "solid grey 2px";
 })
 
+//PROFILE BUTTON//
+const profileButton = document.getElementById("profileButton")
+profileButton.addEventListener("click", () => {
+	menuState = "profile"
+	playSoundEffect("button")
+})
+//set glow value higher if hovering, set back when un-hover
+profileButton.addEventListener("mouseover", () => {
+	profileButton.style.textShadow = "0px 0px 10px rgba(255, 255, 255, 1)";
+	profileButton.style.border = "solid whitesmoke 2px";
+})
+profileButton.addEventListener("mouseout", () => {
+	profileButton.style.textShadow = "0px 0px 8px rgba(255, 255, 255, 0.5)";
+	profileButton.style.border = "solid grey 2px";
+})
 
 //SCORES BUTTON//
 const scoresButton = document.getElementById("scoresButton")
