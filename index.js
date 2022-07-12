@@ -1,4 +1,5 @@
 //running js and parsing canvas
+connection()
 var canvas = document.querySelector("canvas")
 var c = canvas.getContext("2d")
 canvas.shadowBlur = 0
@@ -389,7 +390,7 @@ function DrawBackground(){ //creates the background gradient, draws it
 let musicVolume
 let waveCount = 0
 let gameState
-let menuState
+let menuState = "titles"
 var bullets = []
 var enemyBullets = []
 var aliveEnemies = []
@@ -563,22 +564,15 @@ function gameplayLoop() {
 			//set relevant HTML elements to visible or non-visible
 			document.getElementById("titleScreen").style.display = "grid"
 			document.getElementById("optionsScreen").style.display = "none"
-			document.getElementById("scoresScreen").style.display = "none"
 			document.getElementById("profileScreen").style.display = "none"
-
-		} else if (menuState === "scores") { //high scores screen
-			//set relevant HTML elements to visible or non-visible
-			document.getElementById("scoresScreen").style.display = "grid"
-			document.getElementById("optionsScreen").style.display = "none"
-			document.getElementById("titleScreen").style.display = "none"
-			document.getElementById("profileScreen").style.display = "none"
+			document.getElementById("loginRegisterScreen").style.display = "none"
 
 		} else if (menuState === "options") { //options menu
 			//set relevant HTML elements to visible or non-visible
 			document.getElementById("optionsScreen").style.display = "grid"
-			document.getElementById("scoresScreen").style.display = "none"
 			document.getElementById("titleScreen").style.display = "none"
 			document.getElementById("profileScreen").style.display = "none"
+			document.getElementById("loginRegisterScreen").style.display = "none"
 			//options slider logic
 			document.getElementById("soundEffectsVolumeText").innerHTML = "<span class='bold'>SFX Volume: </span>" + document.getElementById("soundEffectsVolume").value + "%"
 			document.getElementById("musicVolumeText").innerHTML = "<span class='bold'>Music Volume: </span>" + document.getElementById("musicVolume").value + "%"
@@ -586,10 +580,16 @@ function gameplayLoop() {
 		} else if (menuState === "profile") { //profile screen
 			//set relevant HTML elements to visible or non-visible
 			document.getElementById("profileScreen").style.display = "grid"
-			document.getElementById("scoresScreen").style.display = "none"
 			document.getElementById("optionsScreen").style.display = "none"
 			document.getElementById("titleScreen").style.display = "none"
+			document.getElementById("loginRegisterScreen").style.display = "none"
 
+		} else if (menuState === "loginRegister") { //login/register screen
+			//set relevant HTML elements to visible or non-visible
+			document.getElementById("loginRegisterScreen").style.display = "grid"
+			document.getElementById("optionsScreen").style.display = "none"
+			document.getElementById("titleScreen").style.display = "none"
+			document.getElementById("profileScreen").style.display = "none"
 		}
 		//set relevant HTML elements to visible or non-visible
 		document.getElementById("paused").style.display = "none"
@@ -754,17 +754,24 @@ function getScores(){ //AJAX REQUEST: creates server GET request to retrieve the
 		if(this.status == 200){ //200 = success code
 			scoreData = JSON.parse(this.responseText) //parse the JSON response and save to object
 			console.log(scoreData)
-			if (gameState === "title screen") { //if on title screen, show on scoreboard
-
-				document.getElementById("scoreBoardPlayer").innerHTML = "<span class='bold'>PLAYER</span>"
-				document.getElementById("scoreBoardScore").innerHTML = "<span class='bold'>SCORE</span>"
-
-				for (let entry = 0; entry < 5; entry++) { //go through top 5 scores, set HTML iteratively
+			if (gameState === "title screen" && menuState === "titles") { //if on title screen, show on leaderboard
 				
-					document.getElementById("scoreBoardPlayer").innerHTML = document.getElementById("scoreBoardPlayer").innerHTML + "<br><br>" + scoreData[entry].Player
-					document.getElementById("scoreBoardScore").innerHTML = document.getElementById("scoreBoardScore").innerHTML + "<br><br>" + scoreData[entry].Score
+				let table = document.getElementById("scoreTable")
+				for (let entry = 0; entry < 50; entry++) {
+					console.log(entry)
+					let rank = entry + 1
+					let row = table.insertRow(entry)
+					let rankCell = row.insertCell(0)
+					let playerCell = row.insertCell(1)
+					let scoreCell = row.insertCell(2)
+					rankCell.innerHTML = `${rank}.`
+					playerCell.innerHTML = scoreData[entry].Player
+					scoreCell.innerHTML = scoreData[entry].Score
 
 				}
+				document.getElementById("leaderboardContent").innerHTML += "</table>"
+				console.log("leaderboard updated...")
+
 			} else if (gameState === "game over") { //if on game over, show on game over screen
 
 				document.getElementById("gameOverScoreBoardPlayer").innerHTML = "<span class='bold'>PLAYER</span>"
@@ -799,17 +806,7 @@ function resetValues() { //prepare new game by resetting values
 	waveCount = 0
 	enemyCount = 0
 }
-//play button hover mouse listeners: set glow value higher if hovering
-playButton.addEventListener("mouseover", () => {
-	playHover = true
-	playButton.style.textShadow = "0px 0px 10px rgba(255, 255, 255, 1)";
-	playButton.style.border = "solid whitesmoke 2px";
-})
-playButton.addEventListener("mouseout", () => {
-	playHover = false
-	playButton.style.textShadow = "0px 0px 8px rgba(255, 255, 255, 0.5)";
-	playButton.style.border = "solid grey 2px";
-})
+
 
 
 //OPTIONS BUTTON//
@@ -818,15 +815,8 @@ optionsButton.addEventListener("click", () => {
 	menuState = "options"
 	playSoundEffect("button")
 })
-//set glow value higher if hovering, set back when un-hover
-optionsButton.addEventListener("mouseover", () => {
-	optionsButton.style.textShadow = "0px 0px 10px rgba(255, 255, 255, 1)";
-	optionsButton.style.border = "solid whitesmoke 2px";
-})
-optionsButton.addEventListener("mouseout", () => {
-	optionsButton.style.textShadow = "0px 0px 8px rgba(255, 255, 255, 0.5)";
-	optionsButton.style.border = "solid grey 2px";
-})
+
+
 
 
 //OPTIONS BACK BUTTON
@@ -835,15 +825,8 @@ optionsBackButton.addEventListener("click", () => {
 	menuState = "titles"
 	playSoundEffect("button")
 })
-//set glow value higher if hovering, set back when un-hover
-optionsBackButton.addEventListener("mouseover", () => {
-	optionsBackButton.style.textShadow = "0px 0px 10px rgba(255, 255, 255, 1)";
-	optionsBackButton.style.border = "solid whitesmoke 2px";
-})
-optionsBackButton.addEventListener("mouseout", () => {
-	optionsBackButton.style.textShadow = "0px 0px 8px rgba(255, 255, 255, 0.5)";
-	optionsBackButton.style.border = "solid grey 2px";
-})
+
+
 
 //PROFILE BUTTON//
 const profileButton = document.getElementById("profileButton")
@@ -851,49 +834,29 @@ profileButton.addEventListener("click", () => {
 	menuState = "profile"
 	playSoundEffect("button")
 })
-//set glow value higher if hovering, set back when un-hover
-profileButton.addEventListener("mouseover", () => {
-	profileButton.style.textShadow = "0px 0px 10px rgba(255, 255, 255, 1)";
-	profileButton.style.border = "solid whitesmoke 2px";
-})
-profileButton.addEventListener("mouseout", () => {
-	profileButton.style.textShadow = "0px 0px 8px rgba(255, 255, 255, 0.5)";
-	profileButton.style.border = "solid grey 2px";
+
+//LOGIN OR REGISTER BUTTON//
+const loginRegisterButton = document.getElementById("loginRegisterButton")
+loginRegisterButton.addEventListener("click", () => {
+	menuState = "loginRegister"
+	playSoundEffect("button")
 })
 
-//SCORES BUTTON//
-const scoresButton = document.getElementById("scoresButton")
-scoresButton.addEventListener("click", () => {
+//REFRESH SCORES BUTTON (MAIN MENU)//
+const refreshScoresButton = document.getElementById("refreshScores")
+refreshScoresButton.addEventListener("click", () => {
 	getScores()
-	menuState = "scores"
 	playSoundEffect("button")
-})
-//set glow value higher if hovering, set back when un-hover
-scoresButton.addEventListener("mouseover", () => {
-	scoresButton.style.textShadow = "0px 0px 10px rgba(255, 255, 255, 1)";
-	scoresButton.style.border = "solid whitesmoke 2px";
-})
-scoresButton.addEventListener("mouseout", () => {
-	scoresButton.style.textShadow = "0px 0px 8px rgba(255, 255, 255, 0.5)";
-	scoresButton.style.border = "solid grey 2px";
+	refreshScoresButton.classList.remove('refreshClick') // reset animation
+	void refreshScoresButton.offsetWidth // trigger reflow
+	refreshScoresButton.classList.add('refreshClick') // start animation
 })
 
 
-//SCORES BACK BUTTON
-const scoresBackButton = document.getElementById("scoresBackButton")
-scoresBackButton.addEventListener("click", () => {
-	menuState = "titles"
-	playSoundEffect("button")
-})
-//set glow value higher if hovering, set back when un-hover
-scoresBackButton.addEventListener("mouseover", () => {
-	scoresBackButton.style.textShadow = "0px 0px 10px rgba(255, 255, 255, 1)";
-	scoresBackButton.style.border = "solid whitesmoke 2px";
-})
-scoresBackButton.addEventListener("mouseout", () => {
-	scoresBackButton.style.textShadow = "0px 0px 8px rgba(255, 255, 255, 0.5)";
-	scoresBackButton.style.border = "solid grey 2px";
-})
+
+
+
+
 
 //GAME OVER RETURN BUTTON
 const returnToMenu = document.getElementById("returnToMenu")
@@ -903,18 +866,37 @@ returnToMenu.addEventListener("click", () => {
 	playSoundEffect("button")
 	resetValues()
 })
-//set glow value higher if hovering, set back when un-hover
-returnToMenu.addEventListener("mouseover", () => {
-	returnToMenu.style.textShadow = "0px 0px 10px rgba(255, 255, 255, 1)";
-	returnToMenu.style.border = "solid whitesmoke 2px";
-})
-returnToMenu.addEventListener("mouseout", () => {
-	returnToMenu.style.textShadow = "0px 0px 8px rgba(255, 255, 255, 0.5)";
-	returnToMenu.style.border = "solid grey 2px";
-})
+
+
+function connection(){ 
+	var request = new XMLHttpRequest() //create new request
+	request.open("GET", "connection.php", true) //set GET request
+	request.setRequestHeader("Content-type", "application/x-www-form-urlencoded") //set request type
+
+	request.onload = function(){
+		if(this.status == 200){ //200 = success code
+			response = this.responseText
+			console.log(response)
+			secure = 1
+		} else if (this.status == 404){ //404 = no file code
+			console.log("Running in insecure mode")
+		}
+	}
+
+	request.onerror = function(){ //error handle
+		console.log("There was an error establishing a connection to the server.")
+	}
+
+	//send request to the server
+	request.send()
+}
+
+let secure = 0
+
 //startup
 init()
 resetValues()
+getScores()
 gameplayLoop()
 
 

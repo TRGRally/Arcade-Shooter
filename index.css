@@ -93,14 +93,14 @@ body { /* set universal styles */
 #titleScreen {
     display: grid;
     grid-template-areas: /* title screen layout */
-        "topleft top topright"
-        "midleft middle middleright"
-        "bottomleft bottom bottomright";
+        "loginregister title title social"
+        "showcase play scoreboard side"
+        "options name name side2";
     align-items: center;
     justify-items: center;
     vertical-align: middle;
     height: 100vh;
-    grid-template-columns: 1fr 4fr 1fr;
+    grid-template-columns: 1fr 2fr 2fr 1fr;
     grid-template-rows: 1fr 4fr 1fr;
     box-shadow: 0px 0px 8px rgba(200, 200, 200, 0.8); /* GLOW FOR BUTTONS */
     text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
@@ -114,11 +114,13 @@ body { /* set universal styles */
     text-align: middle;
     vertical-align: bottom;
     color: white;
-    grid-area: top;
+    grid-area: title;
+    animation: rotating 15.5s ease-in-out infinite;
 }
 
+
 #playButton {
-    font-size: 70px;
+    font-size: 100px;
     position: relative;
     padding-top: 0px;
     padding-right: 10px;
@@ -127,10 +129,8 @@ body { /* set universal styles */
     text-decoration: none;
     text-align: middle;
     color: white;
-    border: solid grey 2px;
-    border-radius: 12px;
-    grid-area: middle;
-    top: 10px;
+    grid-area: play;
+    text-shadow: 0px 0px 15px rgba(255, 255, 255, 0.9);
 }
 
 #scoresButton {
@@ -143,29 +143,99 @@ body { /* set universal styles */
     text-decoration: none;
     text-align: middle;
     color: whitesmoke;
-    border: solid grey 2px;
     background-color: rbga(255,255,255, 1);
-    border-radius: 12px;
-    grid-area: topleft;
+    grid-area: social;
 }
+
+#leaderboard {
+    grid-area: scoreboard;
+    position: relative;
+    font-size: 45px;
+    width: 100%;
+    height: 95%;
+    background-color: rgba(255,255,255, 0.1);
+    color: rgba(255,255,255,0.1);
+    border-radius: 5px;
+    overflow-y: scroll;
+    display: grid;
+    grid-template-areas:
+        "title"
+        "content";
+    grid-template-rows: 0.1fr, 2fr;
+    grid-gap: 10px;
+
+}
+
+#scoreTable {
+    width: 100%;
+}
+
+table, th, td {
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    border-radius: 2px;
+    border-collapse: collapse;
+    padding-left: 3px;
+    padding-right: 3px;
+  }
+#leaderboardTitle {
+    grid-area: title;
+    position: relative;
+    font-size: 45px;
+    text-align: middle;
+}
+
+#leaderboardContent {
+    grid-area: content;
+    font-size: 25px;
+    position: relative;
+    text-align: left;
+}
+
+
+
+
+#refreshScores {
+    position: relative;
+    align-self: end;
+    justify-self: right;
+    bottom: 3%;
+    right: 0.5%;
+    grid-area: scoreboard;
+    transition-duration: 0.1s;
+}
+
+.refreshClick {
+    animation: spin 0.5s ease-out 1;
+    transition-duration: 0.1s;
+}
+
 
 #optionsButton {
     position: relative;
-    grid-area: bottomleft;
-    border: solid grey 2px;
-    border-radius: 12px;
+    grid-area: options;
+}
+
+
+#loginRegisterButton {
+    position: absolute;
+    /* make the button align to the top left of the grid area */
+    font-size: 30px;
+    top: 5px;
+    left: 5px;
+    grid-area: loginregister;
+    border: solid grey 0px;
+    
+
 }
 
 #profileButton {
     position: relative;
-    grid-area: midleft;
-    border: solid grey 2px;
-    border-radius: 12px;
+    grid-area: showcase;
 }
 
 #dev {
     position: relative;
-    grid-area: midleft;
+    grid-area: showcase;
     top: 100px;
 }
 
@@ -176,7 +246,7 @@ body { /* set universal styles */
     padding: 10px;
     text-align: middle;
     vertical-align: bottom;
-    grid-area: bottom;
+    grid-area: name;
     box-sizing: border-box;
     text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5);
 }
@@ -190,7 +260,7 @@ body { /* set universal styles */
     padding: 10px;
     text-align: middle;
     vertical-align: bottom;
-    grid-area: bottom;
+    grid-area: name;
     border: solid grey 2px;
     border-radius: 4px;
     box-sizing: border-box;
@@ -214,6 +284,49 @@ body { /* set universal styles */
     box-shadow: 0px 0px 8px rgba(200, 200, 200, 0.8); /* GLOW FOR BUTTONS */
     text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
 
+}
+
+#profileText {
+    font-size: 80px;
+    padding: 10px;
+    position: relative;
+    text-align: middle;
+    vertical-align: middle;
+    color: white;
+    grid-area: topmiddle;
+}
+
+#profileBackButton {
+    font-size: 50px;
+    position: relative;
+    padding-top: 0px;
+    padding-right: 10px;
+    padding-bottom: 0px;
+    padding-left: 10px;
+    text-align: middle;
+    vertical-align: middle;
+    color: white;
+    border: solid grey 2px;
+    border-radius: 12px;
+    grid-area: topleft;
+}
+
+/* LOGIN REGISTER SCREEN BELOW */
+
+#loginRegisterScreen {
+    display: none;
+    align-items: center;
+    justify-items: center;
+    vertical-align: middle;
+    height: 100vh;
+    grid-template-areas: 
+        "topleft topmiddle topright"                      
+        "midleft middle middleright"                    
+        "bottomleft bottom bottomright";
+    grid-template-columns: 1fr 4fr 1fr;
+    grid-template-rows: 1fr 4fr 1fr;
+    box-shadow: 0px 0px 8px rgba(200, 200, 200, 0.8); /* GLOW FOR BUTTONS */
+    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
 }
 
 /* SCORES SCREEN BELOW */
@@ -453,3 +566,105 @@ body { /* set universal styles */
     color: red;
     text-shadow: 0px 0px 8px rgba(255, 0, 0, 0.5);
 }
+
+.button:hover {
+    text-shadow: 0px 0px 15px rgba(255, 255, 255, 0.747);
+    background-color:rgba(255, 255, 255, 0.15);
+    transition-duration: 0.1s;
+    transform: scale(0.95);
+}
+
+.button{
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0);
+    transition-duration: 0.1s;
+    transform: scale(1);
+}
+
+.important{
+    animation: rotating 3.5s ease-in-out infinite;
+}
+
+.important:hover{
+    animation: blink 2s infinite, rotating 3.5s ease-in-out infinite;
+    transition-duration: 0.1s;
+}
+
+.overlay{
+    z-index: 9;
+    
+}
+
+
+/* ANIMS */
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes rotating {
+    0%{
+        transform: rotate(-1deg);
+    }
+    50%{
+        transform: rotate(1deg);
+    }
+    100%{
+        transform: rotate(-1deg);
+    }
+}
+
+@keyframes bulge {
+    0%{
+        transform: scale(1);
+    }
+    50%{
+        transform: scale(0.85);
+    }
+    100%{
+        transform: scale(1);
+    }
+}
+
+@keyframes spin {
+    0%{
+        transform: rotate(0deg);
+    }
+    100%{
+        transform: rotate(360deg);
+    }
+}
+
+/* SCROLL BAR */
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0);
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: rgb(167, 166, 166);
+    border-radius: 6px;
+    transition-duration: 0.3s;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(99, 99, 99);
+    transition-duration: 0.3s;
+    
+  }
