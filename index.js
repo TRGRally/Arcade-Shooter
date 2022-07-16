@@ -587,9 +587,6 @@ function gameplayLoop() {
 		} else if (menuState === "loginRegister") { //login/register screen
 			//set relevant HTML elements to visible or non-visible
 			document.getElementById("loginRegisterScreen").style.display = "grid"
-			document.getElementById("optionsScreen").style.display = "none"
-			document.getElementById("titleScreen").style.display = "none"
-			document.getElementById("profileScreen").style.display = "none"
 		}
 		//set relevant HTML elements to visible or non-visible
 		document.getElementById("paused").style.display = "none"
@@ -744,6 +741,15 @@ function submitScore(){ //AJAX REQUEST: creates server POST request to store the
 	//send request to the server
 	request.send(params)
 }
+
+function login() { //AJAX REQUEST: creates server POST request to store the player's score and name into the database
+	
+}
+
+
+
+
+
 
 function getScores(){ //AJAX REQUEST: creates server GET request to retrieve the stored scores information form the database
 	var request = new XMLHttpRequest() //create new request
