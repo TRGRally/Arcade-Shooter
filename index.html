@@ -1,106 +1,189 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 	<!--import font from google fonts-->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> 
-  	<!--import css file-->
-  <link rel="stylesheet" href="index.css">
-  <title>ARCADE SHOOTER</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100;200;300;400&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400&display=swap" rel="stylesheet">
+	<link rel="icon" type="image/x-icon" href="favicon.ico">
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<!--icon library-->
+	<script src="https://kit.fontawesome.com/a72ddb0f06.js" crossorigin="anonymous"></script>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-VD4M42PWHL"></script>
+	<script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+
+	gtag('config', 'G-VD4M42PWHL');
+	</script> 
+	
+	<!--link to javascript files-->
+	
+
+	<!--import css file-->
+	<link rel="stylesheet" href="./css/index.css">
+	<link rel="stylesheet" href="./css/mobile.css">
+	<title>PETERHOLL GAME</title>
+	<!--<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	-->
+	<meta name="description" content="PETERHOLL GAME MADE IN HIS MEMORY 1912-2020">
+	<meta name="author" content="Peter Holl">
+	<meta name="keywords" content="Arcade, Shooter, game, peterholl game, peterholl, peter holl">
 </head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<body>
+	<p style="display: none;">Play now! Peterholl Game is an arcade-style shooter game with a global leaderboard!</p>
+	<p style="display: none">peter holl peterholl shooter game peterholl game peterholl peter holl peter holl peterholl game peterholl game peterholl game peterholl game peterholl game peterholl game </p>
+	<p style="display: none">peter holl peterholl shooter game peterholl game peterholl peter holl peter holl peterholl game peterholl game peterholl game peterholl game peterholl game peterholl game </p>
+	<p style="display: none">peter holl peterholl shooter game peterholl game peterholl peter holl peter holl peterholl game peterholl game peterholl game peterholl game peterholl game peterholl game </p>
 
-
-</div> <!--create canvas-->
-<canvas id="canvas" style="position: absolute; user-select: none;"></canvas>
-
-  
-
-<!--PAUSE MENU-->
-<div id="paused" style="color: white;">
-	<div id="pausedText" style="color: white;">PAUSED</div>
-</div>
-
-<div id="HUD" style="color: white;">
-<!--HUD items-->
-	<div id = "HP" style="color: white; ">HP</div>
-	<progress id="healthBar" value="100" max="100"></progress>
-	<div id="fps" style="color: white;">FPS:</div>
-	<div id="score" style="color: white;">SCORE 0</div>
-	<div id="waves" style="color: white;">WAVE 0</div>
-</div>
-
-<div id ="titleScreen">
-<!--title screen items-->
-	<div id="playButton" class="button important" style="color: white;">PLAY</div>
-	<form id="nameBlock">
-		<label for="name" id="nameLabel">NAME:</label>
-		<input id="name" type="search" autocomplete="off" spellcheck="false" autofocus="true" maxLength="16">
-	</form>
-	<div id="gameTitle" style="color: white;">ARCADE SHOOTER</div>
-	<div id="leaderboard" style="color: white;">
-		<div id="leaderboardTitle" style="color: white; justify-self: center;">LEADERBOARD</div>
-		<div id="leaderboardContent" style="color: white;"><table id="scoreTable"></table></div>
+	<div id="desktopReminder">
+		<div id="reminderText">Come back on desktop to play!</div>
 	</div>
-	<img id="refreshScores" class="button" src="./images/refresh.png" alt="refresh scores" width="50" height="50">
-	<img id="optionsButton" class="button" src="./images/options.png" alt="options" width="100" height="100">
-	<img id="profileButton" class="button" src="./images/profile.png" alt="profile" width="100" height="100">
-	<div id="loginRegisterButton" class="button bold">LOGIN OR REGISTER </div>
-	<div id="dev" class="button" style="color: white;">IGNORE THIS IT DOESNT WORK AT ALL YET</div>
-</div>
+	</div> <!--create canvas-->
+	<canvas id="canvas" style="position: absolute; user-select: none;"></canvas>
 
-<div id="loginRegisterScreen">
-<!--login/register screen items-->
-	<div id="loginRegisterTitle" style="color: white;">LOGIN OR REGISTER</div>
-	<form id="loginForm">
-		<label for="loginUsername" id="loginUsernameLabel" style="color: white;">USERNAME:</label>
-		<input id="loginUsername" type="search" autocomplete="off" spellcheck="false" autofocus="true" maxLength="16">
-		<label for="loginPassword" id="loginPasswordLabel" style="color: white;">PASSWORD:</label>
-		<input id="loginPassword" type="search" autocomplete="off" spellcheck="false" autofocus="true" maxLength="24">
-	</form>
-	
-	<div id="loginButton" class="button">LOGIN</div>
-	<div id="registerButton" class="button">REGISTER</div>
-	<div id="backButton" class="button">BACK</div>
-</div>
 	
 
+	<!--PAUSE MENU-->
+	<div id="paused">
+		<div id="pausedText">PAUSED</div>
+	</div>
+
+	<div id="HUD">
+	<!--HUD items-->
+		<div id = "HP" style="color: white; ">HP</div>
+		<progress id="healthBar" value="100" max="100"></progress>
+		<div id="fps">FPS:</div>
+		<div id="score">SCORE 0</div>
+		<div id="waves">WAVE 0</div>
+	</div>
+
+	<div id ="titleScreen">
+	<!--title screen items-->
+		<div id="playButton" class="button important" >PLAY</div>
+		<div id="loggedInAs" class="title tooltip">Playing as Guest</div>
+		<div id="gameTitle" class="title">PETERHOLL GAME</div>
+		<div id="leaderboard">
+			<div id="leaderboardTitle" class="title" >LEADERBOARD</div>
+			<img id="refreshScores" class="button" src="./images/refresh.png" alt="refresh scores" width="40" height="40">
+			<div id="leaderboardContent"><table id="scoreTable"></table></div>
+		</div>
+		
+		<div id="loginRegisterButton" class="button bold">LOGIN</div>
+
+		<nav id="sidebar">
+			<ul id="sidebar-list">
+				<li class="sidebar-item sidebutton">
+					<img id="profileButton" src="./images/profile.png" alt="profile" width="71%">
+					<span class="button-text">Profile</span>
+				</li>
+				
+				<li class="sidebar-item sidebutton">
+					<img id="optionsButton" class="sidebutton" src="./images/options.png" alt="options" width="71%">
+					<span class="button-text">Options</span>
+				</li>
+
+				<li class="sidebar-item sidebutton">
+					<svg id="discordButton" class="sidebutton" width="71" height="71" viewBox="0 0 71 71" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<g clip-path="url(#clip0)">
+						<path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5502 44.3433C53.9057 44.6363 54.2779 44.9293 54.6529 45.2082C54.7816 45.304 54.7732 45.5041 54.6333 45.5858C52.8646 46.6197 51.0259 47.4931 49.0921 48.2228C48.9662 48.2707 48.9102 48.4172 48.9718 48.5383C50.038 50.6034 51.2554 52.5699 52.5959 54.435C52.6519 54.5139 52.7526 54.5477 52.845 54.5195C58.6464 52.7249 64.529 50.0174 70.6019 45.5576C70.6551 45.5182 70.6887 45.459 70.6943 45.3942C72.1747 30.0791 68.2147 16.7757 60.1968 4.9823C60.1772 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z" fill="#ffffff"/>
+						</g>
+						<defs>
+						<clipPath id="clip0">
+						<rect width="71" height="71" fill="white"/>
+						</clipPath>
+						</defs>
+						</svg>
+					<span class="button-text">Discord</span>
+				</li>
+
+				<li class="sidebar-item sidebutton">
+					<i id="githubButton" class="fa-brands fa-github sidebutton"></i>
+					<span class="button-text">GitHub</span>
+				</li>
+
+				<li class="sidebar-item sidebutton">
+					<img id="moreGamesButton" class="sidebutton" src="./images/more-games.svg" alt="about" width="71%">
+					<span class="button-text">More</span>
+				</li>
+
+				<li class="sidebar-item sidebutton">
+					<img id="aboutButton" class="sidebutton" src="./images/information.svg" alt="about" width="71%">
+					<span class="button-text">About</span>
+				</li>
+			</ul>
+		</nav>
+	</div>
+	<div id="loginRegisterScreen">
+		<div id="loginRegisterWindow"> <!--container for overlay-->
+		<!--login/register screen items-->
+			<div id="loginRegisterTitle" class="title">ACCOUNT</div>
+			<form id="loginForm">
+				<input id="loginUsername" class="textinput" type="text" placeholder="Username" autocomplete="off" spellcheck="false" autofocus="true" maxLength="16">
+				<input id="loginPassword" class="textinput" type="password" placeholder="Password" autocomplete="off" spellcheck="false" autofocus="true" maxLength="24">
+			</form>
+			<div id="status">dont forget your password cause i havent coded shit for recovery yet</div>
+			<div class="button bold" id="loginButton">LOGIN</div>
+			<div class="button bold" id="registerButton">REGISTER</div>
+		</div>
+	</div>
+
+	<div id ="optionsScreen">
+	<!--options screen items-->
+		<div id="optionsText">OPTIONS</div>
+		<input id="soundEffectsVolume" type="range" min="0" max="100" value="60" class="slider">
+		<div id="soundEffectsVolumeText">SFX Volume</div>
+		<input id="musicVolume" type="range9" min="0" max="100" value="60" class="slider">
+		<div id="musicVolumeText">Music Volume</div>
+		<div id="optionsBackButton" class="button">BACK</div>
+	</div>
 
 
+	<div id ="profileScreen">
+	<!--profile screen items-->
+		<div id="profileText" class="uipanel">PROFILE</div>
+		<i id="profileBackButton" class="fa-solid fa-arrow-left button"></i>
+		<div id="profileStats" class="uipanel">
+			<div id="profileStatsTitle">STATS</div>
+			<div id="profileStatsSection">
+				<div id="profileHighScore" class="stat" style="grid-area: highscore">Highest score</div>
+				<div id="profileHighScoreNumber" class="stat" style="grid-area: highscoreNumber">9999</div>
+				<div id="profileGames" class="stat" style="grid-area: games">Games played</div>
+				<div id="profileGamesNumber" class="stat" style="grid-area: gamesNumber">99</div>
+				<div id="profileShots" class="stat" style="grid-area: shots">Shots fired</div>
+				<div id="profileShotsNumber" class="stat" style="grid-area: shotsNumber">99999</div>
+				<div id="profileHighWave" class="stat" style="grid-area: highwave">Highest wave</div>
+				<div id="profileHighWaveNumber" class="stat" style="grid-area: highwaveNumber">99</div>
+			</div>
+		</div>
+		<div id="profileCustomisation" class="uipanel">
+			<div id="profileCustomisationTitle">CHARACTER</div>
+			<div id="characterShowcase">
+				<img id="profileCharacter" src="../favicon.ico" alt="Player Character" width="100" height="100"></img>
+				<div id="profileName">Username</div>
+			</div>
+			<div id="profileColorContainer">
+				<div id="profileColorTitle">Colour</div>
+				<input id="colorR" type="range" min="0" max="255" value="80" class="slider">
+				<input id="colorG" type="range" min="0" max="255" value="30" class="slider">
+				<input id="colorB" type="range" min="0" max="255" value="255" class="slider">
+			</div>
+		</div>
+	</div>
 
 
+	<div id="gameOverScreen" >
+	<!--game over screen items-->
+		<div id="gameOver" >GAME OVER</div>
+		<div id="gameOverScoreBoardRank"><span class='bold'>RANK</span><br><br>1<br><br>2<br><br>3<br><br>4<br><br>5</div>
+		<div id="gameOverScoreBoardPlayer">PLAYER</div>
+		<div id="gameOverScoreBoardScore">SCORE</div>
+		<div id="returnToMenu" class="button">RETURN TO MENU</div>
+	</div>
+</body>
 
-
-<div id ="optionsScreen">
-<!--options screen items-->
-	<div id="optionsText" style="color: white;">OPTIONS</div>
-	<input id="soundEffectsVolume" type="range" min="0" max="100" value="60" class="slider">
-	<div id="soundEffectsVolumeText" style="color: white;">SFX Volume</div>
-	<input id="musicVolume" type="range" min="0" max="100" value="60" class="slider">
-	<div id="musicVolumeText">Music Volume</div>
-	<div id="optionsBackButton" class="button">BACK</div>
-</div>
-
-
-<div id ="profileScreen">
-<!--profile screen items-->
-	<div id="profileText" style="color: white;">PROFILE</div>
-	<div id="profileName" style="color: white;">NAME</div>
-	<div id="profileScore" style="color: white;">SCORE</div>
-	<div id="profileBackButton" class="button" style="color: white;">BACK</div>
-</div>
-
-
-<div id="gameOverScreen" style="color: white;">
-<!--game over screen items-->
-	<div id="gameOver" style="color: white;">GAME OVER</div>
-	<div id="gameOverScoreBoardRank" style="color: white;"><span class='bold'>RANK</span><br><br>1<br><br>2<br><br>3<br><br>4<br><br>5</div>
-	<div id="gameOverScoreBoardPlayer" style="color: white;">PLAYER</div>
-	<div id="gameOverScoreBoardScore" style="color: white;">SCORE</div>
-	<div id="returnToMenu" class="button" style="color: white;">RETURN TO MENU</div>
-</div>
-
-<!--link to javascript file-->
-<script src="./index.js"></script>
+<script src="./js/index.js"></script>
+</html>

@@ -1,3 +1,19 @@
+//GLOBAL SCOPE DECLARATIONS
+let scoreData = null
+let client = null
+let musicVolume
+let waveCount = 0
+let gameState
+menuState = "titles"
+var bullets = []
+var enemyBullets = []
+var aliveEnemies = []
+var deadEnemies = 0
+var regen = false
+let healthThreshold
+var enemyCollisionThisFrame = 0
+let goingToProfle = false
+
 //running js and parsing canvas
 connection()
 var canvas = document.querySelector("canvas")
@@ -9,7 +25,8 @@ c.imageSmoothingEnabled = true
 var dt = 1
 let mouse = { 	//mouse object for coords
 	x: innerWidth / 2,
-	y: innerHeight / 2
+	y: innerHeight / 2,
+	clicked: false
 }
 
 addEventListener("mousemove", function(event) { //update mouse object coords every time move event detected
@@ -21,16 +38,132 @@ addEventListener("resize", function() { //update render window size when the bro
 	canvas.height = innerHeight
 })
 
-//Distance between two points equation
 function Pythagoras(x1, y1, x2, y2) {
-
 	let xDistance = x2 - x1
-
 	let yDistance = y2 - y1
-
 	return Math.sqrt(Math.pow(xDistance, 2 ) + Math.pow(yDistance, 2))
-
 }
+2
+function playSoundEffect(filename){ //sound effect module, creates new sound object in document with filename passed in
+	let soundEffect = document.createElement("audio")
+	soundEffect.src = "./sounds/" + filename + ".wav" //filename set as sound source
+	soundEffect.volume = document.getElementById("soundEffectsVolume").value / 100
+	soundEffect.play()
+}
+
+class Client {
+	constructor() {
+		this.auth = false
+		this.username = "Default"
+		this.highscore = 0
+		this.highwave = 0
+		this.gamesplayed = 0
+		this.shotsfired = 0
+		this.starttime = new Date()
+		this.alivetime = 0
+	}
+
+	login(username, password) { 
+		var _this = this
+		console.log(username, password)
+		var params = "username=" + username + "&" + "password=" + password //format params for the POST request
+		console.log(params)
+		var request = new XMLHttpRequest()
+		request.open("POST", "../php/login.php", true)
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+		request.onload = function(){
+			if(this.status == 200 && JSON.parse(this.responseText) == true){ //200 = success code
+				console.log("status 200...")
+				console.log("server responded true")
+				_this.auth = true
+				console.log(_this.auth)
+				console.log("authenticated")
+				_this.username = username
+				console.log(_this.username)
+				console.log("username set")
+				menuState = "titles"
+				document.getElementById("loginRegisterButton").style.display = "none"
+				_this.getStats()
+				document.getElementById("loggedInAs").innerHTML = `Playing as ${_this.username}`
+				if (goingToProfile === true) {
+					_this.getStats()
+					menuState = "profile"
+					goingToProfile = false
+				}
+				return true
+			} else {
+				console.log("incorrect details")
+				let status = document.getElementById("status")
+				status.classList = "red"
+				status.innerHTML = "Incorrect username or password"
+				return false
+			}
+		}
+		request.onerror = function(){ //error handle
+			console.log("There was an error with the request, are you connected to the internet?")
+		}
+		request.send(params)
+	}
+
+	getStats() {
+		var _this = this
+		var request = new XMLHttpRequest() //create new request
+		var params = "username=" + this.username
+		request.open("POST", "../php/getStats.php", true) //set GET request
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded") //set request type
+		request.onload = function(){
+			if(this.status == 200){ //200 = success code
+				let statData = JSON.parse(this.responseText) //parse the JSON response and save to object
+				console.log(statData)
+				_this.gamesplayed = parseInt(statData[0].GamesPlayed)
+				_this.highscore = parseInt(statData[0].HighScore)
+				_this.highwave = parseInt(statData[0].HighWave)
+				_this.shotsfired = parseInt(statData[0].ShotsFired)
+			} else if (this.status == 404){ //404 = no file code
+				console.log("Error 404, file not found.")
+			}
+		}
+		request.onerror = function(){ //error handle
+			console.log("There was an error with the request, are you connected to the internet?")
+		}
+		request.send()
+	}
+
+	submitStats() {
+		var _this = this
+		console.log(this.ganesplayed)
+		this.gamesplayed = this.gamesplayed + 1
+		console.log(this.gamesplayed)
+		this.shotsfired = this.shotsfired + player.shotsfired
+		if (player.score > _this.highscore) {
+			_this.highscore = player.score
+		}
+		if (waveCount > _this.highwave) {
+			_this.highwave = waveCount
+		}
+		var request = new XMLHttpRequest()
+		var params = "highscore=" + this.highscore + "&" + "highwave=" + this.highwave + "&" + "gamesplayed=" + this.gamesplayed + "&" + "shotsfired=" + this.shotsfired + "&" + "username=" + this.username
+		request.open("POST", "../php/submitStats.php", true)
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+		request.onload = function(){
+			if (this.status == 200){
+				console.log("updated stats")
+			} else if (this.status == 400){
+				console.log("Error 404, file not found.")
+			}
+		}
+		request.onerror = function(){ //error handle
+			console.log("There was an error with the request, are you connected to the internet?")
+		}
+		request.send(params)
+	}
+
+	update() {
+		let currenttime = new Date()
+		this.alivetime = currenttime - this.starttime
+	}
+}
+
 let regenlock = false
 function HealthRegen(regenSpeed) {
 	if (regenlock == false) {		//check if no other regen has been called
@@ -86,13 +219,6 @@ function SpawnWave(number, radius) { //determines where enmies spawn, what diffi
 		aliveEnemies.push(new Enemy(enemySpawn.x, enemySpawn.y, 30, "rgb(220,60,35)", 100 + (waveCount * 3), 10 + (waveCount / 10), 5 + (waveCount / 3), 10 + (waveCount / 7), 2 + (waveCount / 6 )))
 	}
 	playSoundEffect("new_wave")
-}
-
-function playSoundEffect(filename){ //sound effect module, creates new sound object in document with filename passed in
-	soundEffect = document.createElement("audio")
-	soundEffect.src = "./sounds/" + filename + ".wav" //filename set as sound source
-	soundEffect.volume = document.getElementById("soundEffectsVolume").value / 100
-	soundEffect.play()
 }
 
 function determineRank() { //caluclates rank, displays on game over scoreboard
@@ -161,19 +287,23 @@ function resolveCollision(o1, o2) { //collision handler, passes 2 objects in wit
 
 //defining classes
 class Player { //player template
-	constructor(x, y, radius, color, xVelocity, yVelocity, health, shotDamage) {
+	constructor(x, y, radius, color, xVelocity, yVelocity) {
 		this.x = x
 		this.y = y
 		this.radius = radius
 		this.color = color
 		this.xVelocity = xVelocity
 		this.yVelocity = yVelocity
-		this.health = health
-		this.shotDamage = shotDamage
-		this.shotSpeed = 10
+		this.health = 100
+		this.shotDamage = 50
+		this.bulletSpeed = 8
+		this.shotSpeed = 3
+		this.shotInterval = 1000 / this.shotSpeed
+		this.lastShot = 0
+		this.shotsfired = 0
 		this.score = 0
 		this.mass = 1.5
-		this.name = "ANON"
+		this.name = "Guest"
 		this.rank = 1
 	}
 
@@ -344,18 +474,22 @@ class Enemy { //enemy template
 	worldBorderCollision() { //see player class for notes
 		if (this.y > (canvas.height - this.radius)){
 			this.yVelocity = -this.yVelocity
+			this.y = canvas.height - this.radius
 		}
 
 		if (this.y < this.radius){
 			this.yVelocity = -this.yVelocity
+			this.y = this.radius
 		}
 
 		if (this.x > (canvas.width - this.radius)){
 			this.xVelocity = -this.xVelocity
+			this.x = canvas.width - this.radius
 		}
 
 		if (this.x < this.radius){
 			this.xVelocity = -this.xVelocity
+			this.x = this.radius
 		}
 	}
 
@@ -367,11 +501,10 @@ class Enemy { //enemy template
 	}
 }
 
-
-
 function init() { //called on startup - make sure menu is correct
 	gameState = "title screen"
-	menuScreen = "titles"
+	menuState = "titles"
+	client = new Client()
 }
 
 let enemyCount = 0
@@ -385,20 +518,7 @@ function DrawBackground(){ //creates the background gradient, draws it
 	c.fillRect(0, 0, canvas.width, canvas.height) //fill
 }
 
-
-//init global scope vars, hoisted to beginning of file but put here as used in main loop
-let musicVolume
-let waveCount = 0
-let gameState
-let menuState = "titles"
-var bullets = []
-var enemyBullets = []
-var aliveEnemies = []
-var deadEnemies = 0
-var regen = false
-let healthThreshold
 c.rect(0, 0, canvas.width, canvas.height)
-var enemyCollisionThisFrame = 0
 var framecount = 0
 var lastLoop = new Date()
 
@@ -544,7 +664,17 @@ function gameplayLoop() {
 		
 
 
-
+		let current = new Date()
+		if (mouse.clicked === true && current - player.lastShot >= player.shotInterval) {
+			player.lastShot = new Date()
+			playSoundEffect("player_shoot")
+			let xvel = (mouse.x - player.x) / Pythagoras(mouse.x, mouse.y, player.x, player.y) * player.bulletSpeed //calculate x dir, divide by distance to normalise
+			let yvel = (mouse.y - player.y) / Pythagoras(mouse.x, mouse.y, player.x, player.y) * player.bulletSpeed //calculate x dir, divide by distance to normalise
+			var spread = Math.random() < 0.5 ? -0.2 : 0.2 //add spread
+			player.shotsfired = player.shotsfired + 1
+			console.log(player.shotsfired)
+			bullets.push(new Bullet(player.x, player.y, 10, "rgb(255,250,230)", xvel + spread, yvel + spread, player.shotDamage)) //push new bullet to array
+		}
 		
 		c.fillStyle = bgColor
 
@@ -579,6 +709,11 @@ function gameplayLoop() {
 			musicValue = document.getElementById("musicVolume").value 
 		} else if (menuState === "profile") { //profile screen
 			//set relevant HTML elements to visible or non-visible
+			document.getElementById("profileName").innerHTML = client.username
+			document.getElementById("profileHighScoreNumber").innerHTML = client.highscore
+			document.getElementById("profileGamesNumber").innerHTML = client.gamesplayed
+			document.getElementById("profileHighWaveNumber").innerHTML = client.highwave
+			document.getElementById("profileShotsNumber").innerHTML = client.shotsfired
 			document.getElementById("profileScreen").style.display = "grid"
 			document.getElementById("optionsScreen").style.display = "none"
 			document.getElementById("titleScreen").style.display = "none"
@@ -603,6 +738,7 @@ function gameplayLoop() {
 		if (savedScore == false) {
 			savedScore = true
 			submitScore()
+			client.submitStats()
 			setTimeout(() => {				//wait a short time between each network related function to allow bad response time
 				getScores()
 				setTimeout(() => {
@@ -636,24 +772,21 @@ let playHover
 let savedScore = false
 let player
 
+
+
 //controls
 addEventListener("mousedown", (event) => { //mouse click down event listener -> shoot bullet if currently ingame
-	if (event.button == 0){ //only shoot on left click
-		if (gameState === "playing") { //check for playing game
-			playSoundEffect("player_shoot")
-			xvel = (mouse.x - player.x) / Pythagoras(mouse.x, mouse.y, player.x, player.y) * player.shotSpeed //calculate x dir, divide by distance to normalise
-			yvel = (mouse.y - player.y) / Pythagoras(mouse.x, mouse.y, player.x, player.y) * player.shotSpeed //calculate x dir, divide by distance to normalise
-			var spread = Math.random() < 0.5 ? -0.2 : 0.2 //add spread
-			bullets.push(new Bullet(player.x, player.y, 10, "rgb(255,250,230)", xvel + spread, yvel + spread, player.shotDamage)) //push new bullet to array
-		}
+	if (event.button == 0 && gameState === "playing"){ //only shoot on left click
+		mouse.clicked = true
 	}
 })
 
-
-
 addEventListener("mouseup", (event2) => { //placeholder mouse up for future
-	//up
+	mouse.clicked = false
 })
+
+
+
 //WASD movement
 addEventListener("keydown", (keypress) => { //key down event listener to set WASD keys to true on press
 
@@ -677,6 +810,11 @@ addEventListener("keydown", (keypress) => { //key down event listener to set WAS
 				playSoundEffect("pause")
 			} else if (gameState === "paused"){
 				gameState = "playing"
+				playSoundEffect("unpause")
+			}
+
+			if (gameState === "title screen" && menuState !== "titles") {
+				menuState = "titles"
 				playSoundEffect("unpause")
 			}
 	}
@@ -706,13 +844,14 @@ addEventListener("keyup", (keyup) => { //key up event listener to set WASD keys 
 //PLAY BUTTON
 const playButton = document.getElementById("playButton")
 playButton.addEventListener("click", () => {
-	player = new Player(innerWidth / 2, innerHeight / 1.8, 42, "rgb(63,155,214)", 0, -1, 100, 100, 50) //makes new player
+	player = new Player(innerWidth / 2, innerHeight / 1.8, 42, "rgb(63,155,214)", 0, -1, 100) //makes new player
 	gameState = "playing" //changes game state to playing
 	playSoundEffect("play_button")
-	if (document.getElementById("name").value != ""){ //checks if the name box is empty, if yes, sets default name. if no, copies name to player
-		player.name = document.getElementById("name").value
+	if (client.auth == true){ //checks if the name box is empty, if yes, sets default name. if no, copies name to player
+		player.name = client.username
+		client.getStats()
 	} else {
-		player.name = "ANON"
+		player.name = "Guest"
 	}
 	
 })
@@ -721,9 +860,8 @@ function submitScore(){ //AJAX REQUEST: creates server POST request to store the
 	savedScore = true
 	let scoreDate = Date.now()
 	var params = "name=" + player.name + "&" + "score=" + player.score + "&" + "timestamp=" + scoreDate //format params for the POST request
-	console.log(params)
 	var request = new XMLHttpRequest() //create new request
-	request.open("POST", "submitScore.php", true) //set to POST request, call php file
+	request.open("POST", "../php/submitScore.php", true) //set to POST request, call php file
 	request.setRequestHeader("Content-type", "application/x-www-form-urlencoded") //set request format
 
 	request.onload = function(){
@@ -742,9 +880,6 @@ function submitScore(){ //AJAX REQUEST: creates server POST request to store the
 	request.send(params)
 }
 
-function login() { //AJAX REQUEST: creates server POST request to store the player's score and name into the database
-	
-}
 
 
 
@@ -753,18 +888,16 @@ function login() { //AJAX REQUEST: creates server POST request to store the play
 
 function getScores(){ //AJAX REQUEST: creates server GET request to retrieve the stored scores information form the database
 	var request = new XMLHttpRequest() //create new request
-	request.open("GET", "getScores.php", true) //set GET request
+	request.open("GET", "../php/getScores.php", true) //set GET request
 	request.setRequestHeader("Content-type", "application/x-www-form-urlencoded") //set request type
 
 	request.onload = function(){
 		if(this.status == 200){ //200 = success code
 			scoreData = JSON.parse(this.responseText) //parse the JSON response and save to object
-			console.log(scoreData)
 			if (gameState === "title screen" && menuState === "titles") { //if on title screen, show on leaderboard
-				
 				let table = document.getElementById("scoreTable")
-				for (let entry = 0; entry < 50; entry++) {
-					console.log(entry)
+				table.innerHTML = ""
+				for (let entry = 0; entry < scoreData.length; entry++) {
 					let rank = entry + 1
 					let row = table.insertRow(entry)
 					let rankCell = row.insertCell(0)
@@ -776,7 +909,6 @@ function getScores(){ //AJAX REQUEST: creates server GET request to retrieve the
 
 				}
 				document.getElementById("leaderboardContent").innerHTML += "</table>"
-				console.log("leaderboard updated...")
 
 			} else if (gameState === "game over") { //if on game over, show on game over screen
 
@@ -837,32 +969,99 @@ optionsBackButton.addEventListener("click", () => {
 //PROFILE BUTTON//
 const profileButton = document.getElementById("profileButton")
 profileButton.addEventListener("click", () => {
-	menuState = "profile"
+	
+	if (client.auth == false) {
+		menuState = "loginRegister"
+		goingToProfile = true
+	} else {
+		client.getStats()
+		console.log("retrieved stats")
+		menuState = "profile"
+	}
 	playSoundEffect("button")
 })
 
-//LOGIN OR REGISTER BUTTON//
+
+//DISCORD BUTTON//
+const discordButton = document.getElementById("discordButton")
+discordButton.addEventListener("click", () => {
+	window.open("https://discord.gg/k5Grv8F")
+	playSoundEffect("button")
+})
+
+
+//LOGIN OR REGISTER MENU BUTTON//
 const loginRegisterButton = document.getElementById("loginRegisterButton")
 loginRegisterButton.addEventListener("click", () => {
+	if (client.auth == true) {
+		return
+	}
 	menuState = "loginRegister"
 	playSoundEffect("button")
 })
 
+//LOGGED IN AS TEXT//
+const loggedInAs = document.getElementById("loggedInAs")
+
+//LOGIN BUTTON//
+const loginButton = document.getElementById("loginButton")
+loginButton.addEventListener("click", () => {
+	let username = document.getElementById("loginUsername").value
+	let password = document.getElementById("loginPassword").value
+	console.log(username, password)
+	client.login(username, password)
+	console.log("login button pressed")
+	playSoundEffect("button")
+})
+
+//register BUTTON//
+const registerButton = document.getElementById("registerButton")
+registerButton.addEventListener("click", () => {
+	let username = document.getElementById("loginUsername").value
+	let password = document.getElementById("loginPassword").value
+	register(username, password)
+	playSoundEffect("button")
+})
+
+
+
 //REFRESH SCORES BUTTON (MAIN MENU)//
 const refreshScoresButton = document.getElementById("refreshScores")
 refreshScoresButton.addEventListener("click", () => {
-	getScores()
 	playSoundEffect("button")
+	getScores()
+
+	table = document.getElementById("scoreTable")
+	table.classList.remove('flash') // reset animation
+	void table.offsetWidth // trigger reflow
+	table.classList.add('flash') // start animation
+
 	refreshScoresButton.classList.remove('refreshClick') // reset animation
 	void refreshScoresButton.offsetWidth // trigger reflow
 	refreshScoresButton.classList.add('refreshClick') // start animation
 })
 
+//ABOUT BUTTON//
+const aboutButton = document.getElementById("aboutButton")
+aboutButton.addEventListener("click", () => {
+	playSoundEffect("button")
+	open("http://www.peterholl.com/about")
+})
 
+//MORE GAMES BUTTON//
+const moreGamesButton = document.getElementById("moreGamesButton")
+moreGamesButton.addEventListener("click", () => {
+	playSoundEffect("button")
+	open("http://www.peterholl.com/gearhop")
+})
 
+//PROFILE BACK BUTTON
 
-
-
+const profileBackButton = document.getElementById("profileBackButton")
+profileBackButton.addEventListener("click", () => {
+	playSoundEffect("button")
+	menuState = "titles"
+})
 
 //GAME OVER RETURN BUTTON
 const returnToMenu = document.getElementById("returnToMenu")
@@ -876,12 +1075,12 @@ returnToMenu.addEventListener("click", () => {
 
 function connection(){ 
 	var request = new XMLHttpRequest() //create new request
-	request.open("GET", "connection.php", true) //set GET request
+	request.open("GET", "../php/connection.php", true) //set GET request
 	request.setRequestHeader("Content-type", "application/x-www-form-urlencoded") //set request type
 
 	request.onload = function(){
 		if(this.status == 200){ //200 = success code
-			response = this.responseText
+			let response = this.responseText
 			console.log(response)
 			secure = 1
 		} else if (this.status == 404){ //404 = no file code
@@ -899,12 +1098,80 @@ function connection(){
 
 let secure = 0
 
+
+//update
+function sendAnalytics() {
+	return null
+}
+
+
+function register(username, password) {
+	var params = "username=" + username + "&" + "password=" + password //format params for the POST request
+	var request = new XMLHttpRequest()
+	request.open("POST", "../php/register.php", true)
+	request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+	
+	request.onload = function(){
+		if(this.status == 200){ //200 = success code
+			const registered = JSON.parse(this.responseText)
+			if (registered === true) {
+				login(username, password)
+			} else {
+				console.log("account already exists")
+				let status = document.getElementById("status")
+				status.classList = "red"
+				status.innerHTML = "An account with that username already exists..."
+			}
+		} else if (this.status == 404){ //404 = no file code
+			console.log("Error 404, file not found.")
+		}
+	}
+
+	request.onerror = function(){ //error handle
+		console.log("There was an error with the request, are you connected to the internet?")
+	}
+
+	request.send(params)
+}
+
+
+
+
 //startup
 init()
 resetValues()
 getScores()
 gameplayLoop()
 
+function totalConnections() {
+	var request = new XMLHttpRequest() //create new request
+	request.open("GET", "../php/totalConnections.php", true) //set GET request
+	request.onload = function(){
+		if(this.status == 200){ //200 = success code
+			var connections = this.responseText
+			console.log(connections)
+		} else if (this.status == 404){ //404 = no file code
+			console.log("error fetching total connections")
+		}
+	}
+	request.onerror = function(){ //error handle
+		console.log("There was an error establishing a connection to the server.")
+	}
+	request.send()
+	return JSON.stringify(this.responseText)
+}
 
+window.onbeforeunload = function(){
+	if(gameState !== "playing") {
+		sendAnalytics()
+		return null
+	}
+	if (savedScore == false) {
+		savedScore = true
+		submitScore()
+	}
+	sendAnalytics()
+	return "Your score will be lost!"
+ }
 
 

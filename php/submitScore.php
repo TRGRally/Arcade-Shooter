@@ -3,7 +3,7 @@
 if(isset($_POST["name"]) and isset($_POST["score"]) and isset($_POST["timestamp"])){
     $time = date("H:i:s");
     $date = date("Y-m-d");
-    $db = new PDO("sqlite:scores.db"); //connect to sqlite database file
+    $db = new PDO("sqlite:../db/scores.db"); //connect to sqlite database file
     $statement = ("INSERT INTO scores (Player, Score, Time, Date) VALUES (:player, :score, :time, :date)"); //define statement with placeholder values (protect against SQL inj.)
     $run = $db->prepare($statement); //prepare statement
     $run->bindValue(":player", $_POST["name"], PDO::PARAM_STR); //bind name variable to its placeholder

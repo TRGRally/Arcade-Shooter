@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="About page">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VD4M42PWHL"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-VD4M42PWHL');
+    </script>
+    <title>About</title>
+    <script defer src="./index.js"></script>
+
+    <style>
+
+        body {
+            color: rgb(197, 197, 197);
+            background-color: rgb(21, 20, 20);
+            font-size: 1rem;
+            font-family: 'Noto Sans', sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
+
+        p {
+            max-width: 65ch;
+            align-self: center;
+        }
+
+        * {
+            text-align: center;
+            transition-duration: 0.25s;
+        }
+
+        *:hover {
+            transition-duration: 0.25s;
+        }
+
+        a {
+            color: rgb(125, 192, 255);
+        }
+
+        a:visited {
+            color: rgb(193, 174, 255);
+        }
+
+        .socials {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            align-self: center;
+            justify-self: center;
+            justify-content: center;
+        }
+
+        .icon {
+            margin: 3%;
+            max-width: 4rem;
+            padding: 2rem;
+        }
+
+        .icon:hover {
+            filter: brightness(150%);
+        }
+
+        #dvd {
+            position: absolute;
+            animation: ymove 11s infinite linear, xmove 8.85s infinite linear, rainbow 8s infinite linear;
+            opacity: 0.5
+        }
+
+        @keyframes ymove {
+            0% {
+                top: 0%;
+            }
+            50% {
+                top: calc(100% - 5.7em);
+            }
+            100% {
+                top: 0%;
+            }
+        }
+
+        @keyframes xmove {
+            0% {
+                left: 0%;
+            }
+            50% {
+                left: calc(100% - 8.8em);
+            }
+            100% {
+                left: 0%;
+            }
+        }
+
+        @keyframes rainbow {
+            0% {
+                filter: invert(46%) sepia(41%) saturate(6414%) hue-rotate(335deg) brightness(108%) contrast(100%);
+            }
+            50% {
+                filter: invert(87%) sepia(80%) saturate(4469%) hue-rotate(141deg) brightness(106%) contrast(102%);
+            }
+            100% {
+                filter: invert(46%) sepia(41%) saturate(6414%) hue-rotate(335deg) brightness(108%) contrast(100%);
+            }
+        }
+
+
+        /* SCROLL BAR */
+
+        /* width */
+        ::-webkit-scrollbar {
+        width: 10px;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0);
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+        background: rgb(167, 166, 166);
+        border-radius: 6px;
+        transition-duration: 0.3s;
+        }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+        background: rgb(99, 99, 99);
+        transition-duration: 0.3s;
+        }
+
+
+    </style>
+</head>
+<body>
+    <h1>WTF is this?!</h1>
+
+    <p>Peterholl game is an in-development arcade shooter written in vanilla JavaScript, HTML CSS and PHP. The leaderboard on the title screen is global and tracks all games played. Player profiles are a WIP with the goal of being able to click on a player name to see their stats. <br><br> This page is purely for SEO there is nothing useful here.</p>
+    <p style="display: none">peter holl peterholl shooter game peterholl game peterholl peter holl peter holl peterholl game peterholl game peterholl game peterholl game peterholl game peterholl game </p>
+
+    <h3><a href="">Take me back!!</a></h3>
+
+    <h2>F.A.Q.</h2>
+
+    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">What is peterholl?</a>
+
+    <br><br>
+
+    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Who am I?</a>
+
+    <br><br>
+
+    <a href="https://www.youtube.com/watch?v=aboZctrHfK8">What is the meaning of life?</a>
+
+    <br><br>
+
+    <a href="https://github.com/TRGRally/Arcade-Shooter">How can I contribute to the source code?</a>
+
+    <br><br><br>
+
+    <div class="socials">
+
+        <img class="icon" id="discord" src="../images/Discord.svg" alt="Discord" width="90" height="90"></img>
+
+        <img class="icon" id="steam" src="../images/Steam.svg" alt="Steam" width="90" height="90"></img>
+
+    </div>
+
+    <img id="dvd" src="./images/DVD_logo.png" alt="DVD logo bouncing around the screen" width="140" height="90"></img>
+    
+
+</body>
+</html>

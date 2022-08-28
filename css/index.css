@@ -1,0 +1,953 @@
+body {
+   /* set universal styles */
+   margin: 0;
+   color: white;
+   user-select: none;
+   font-family: "Roboto", sans-serif;
+   font-weight: 100;
+   background-color: black;
+   transition-duration: 0.1s;
+}
+
+* {
+   transition-duration: 0.1s;
+}
+
+*:hover {
+   transition-duration: 0.1s;
+}
+
+#HUD {
+   display: grid;
+   position: relative;
+   align-items: center;
+   justify-items: center;
+   font-size: 60px;
+   text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.8); /* GLOW */
+   grid-template-areas: "topleft topmiddle topright"; /* HUD layout */
+   grid-template-columns: 1fr 1fr 1fr;
+   padding: 2%; /* move HUD away from screen edges */
+   gap: 3%;
+}
+
+#healthBar {
+   position: absolute;
+   width: 35%;
+   height: 50%;
+   bottom: 23%;
+   border: 2px solid white;
+   border-radius: 4px;
+   grid-area: topleft;
+}
+
+#healthBar::-webkit-progress-value {
+   /* specifically the moving bar on the progress bar */
+   background: rgb(255, 63, 63);
+   border-radius: 2px;
+}
+
+#healthBar::-webkit-progress-bar {
+   /* specifically the box which contains the moving bar */
+   background: rgb(26, 25, 23);
+   box-shadow: 0px 0px 11px -2px rgba(255, 255, 255, 1),
+      inset 0px 0px 11px -3px rgba(255, 255, 255, 0.3);
+}
+
+#HP {
+   position: relative;
+   grid-area: topleft;
+   justify-self: start;
+   left: 12%;
+}
+
+#score {
+   grid-area: topright;
+}
+
+#waves {
+   grid-area: topmiddle;
+}
+
+#fps {
+   font-size: 15px;
+   position: absolute;
+   top: 5px;
+   right: 5px;
+}
+
+/* PAUSE MENU BELOW */
+
+#paused {
+   display: grid;
+   grid-template-areas:
+      "topleft top topright"
+      "midleft middle middleright"
+      "bottomleft bottom bottomright";
+   align-items: center;
+   justify-items: center;
+   vertical-align: middle;
+   height: 100vh;
+   grid-template-columns: 1fr 4fr 1fr;
+   grid-template-rows: 1fr 4fr 1fr;
+   text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
+}
+
+#pausedText {
+   position: relative;
+   display: grid;
+   color: white;
+   font-size: 100px;
+   grid-area: middle;
+}
+
+/* TITLE SCREEN BELOW */
+
+#desktopReminder {
+   display: none;
+}
+
+#titleScreen {
+   display: grid;
+   grid-template-areas: /* title screen layout */
+      "loginregister title title social"
+      "showcase play scoreboard side"
+      "options name name side2";
+   align-items: center;
+   justify-items: center;
+   vertical-align: middle;
+   height: 100vh;
+   grid-template-columns: 1fr 2fr 2fr 1fr;
+   grid-template-rows: 1fr 4fr 1fr;
+   box-shadow: 0px 0px 8px rgba(200, 200, 200, 0.8); /* GLOW FOR BUTTONS */
+   text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
+}
+
+#sidebar {
+   width: 8rem;
+   height: 100vh;
+   position: fixed;
+   justify-self: start;
+   background-color: rgba(255, 255, 255, 0.1);
+   transition-duration: 0.2s;
+}
+
+#sidebar:hover {
+   background-color: rgba(255, 255, 255, 0.15);
+   transition-duration: 0.2s;
+}
+
+#sidebar-list {
+   list-style: none;
+   padding: 0;
+   margin: 0;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   height: 100%;
+}
+
+.sidebar-item {
+   width: 100%;
+   font-size: 73px;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   padding-bottom: 1rem;
+   padding-top: 1rem;
+}
+
+#githubButton {
+   padding-bottom: 10px;
+}
+
+.sidebar-item:last-child {
+   margin-top: auto;
+}
+
+.siderbar-item img {
+   min-width: 2rem;
+   max-width: 95%;
+}
+
+.button-text {
+   font-size: 1.5rem;
+}
+
+#gameTitle {
+  font-size: clamp(4em, 7vw, 7vw);
+   position: relative;
+   padding: 10px;
+   padding-left: 1px;
+   padding-right: 1px;
+   text-decoration: none;
+   text-align: middle;
+   vertical-align: bottom;
+   color: white;
+   grid-area: title;
+   animation: rotating 15.5s ease-in-out infinite;
+}
+
+#playButton {
+   font-size: max(5vw, 6px);
+   position: relative;
+   padding-top: 0px;
+   padding-right: 10px;
+   padding-bottom: 0px;
+   padding-left: 10px;
+   text-decoration: none;
+   text-align: middle;
+   color: white;
+   grid-area: play;
+   text-shadow: 0px 0px 15px rgba(255, 255, 255, 0.9), 0px 0px 50px rgba(255, 255, 255, 0.9);
+}
+
+#leaderboard {
+   grid-area: scoreboard;
+   position: relative;
+   font-size: 45px;
+   width: clamp(35rem, 85%, 90%);
+   height: 95%;
+   background-color: rgba(255, 255, 255, 0.1);
+   box-shadow: 0px 0px 4px rgba(255, 255, 255, 0.05);
+   color: white;
+   border-radius: 5px;
+   display: grid;
+   grid-template-areas:
+      "title"
+      "content";
+   grid-template-rows: 0.1fr, 2fr;
+   overflow-y: scroll;
+}
+
+#scoreTable {
+   width: 100%;
+   overflow-y: scroll;
+}
+
+table,
+th,
+td {
+   border: 1px solid rgba(0, 0, 0, 0.4);
+   border-collapse: collapse;
+   padding-left: 0.3em;
+   padding-right: 0.1em;
+   padding-top: 0.2em;
+   padding-bottom: 0.2em;
+}
+
+
+#leaderboardTitle {
+   grid-area: title;
+   position: relative;
+   font-size: 4rem;
+   text-align: center;
+}
+
+#leaderboardContent {
+   grid-area: content;
+   font-size: 30px;
+   position: relative;
+   text-align: left;
+   padding: 1em;
+   padding-top: 0.15em;
+   
+}
+
+#refreshScores {
+   position: relative;
+   align-self: start;
+   justify-self: left;
+   grid-area: title;
+   transition-duration: 0.1s;
+   opacity: 0.85;
+}
+
+.refreshClick {
+   animation: spin 0.5s ease-out 1;
+   transition-duration: 0.1s;
+}
+
+#loginRegisterButton {
+   position: relative;
+   color: rgb(185, 185, 185);
+   background-color: rgba(255, 255, 255, 0.1);
+   padding-left: 0.2em;
+   padding-right: 0.2em;
+   font-size: 30px;
+   font-weight: 100;
+   grid-area: name;
+   border: solid grey 0px;
+   align-self: end;
+   bottom: 10%;
+}
+
+#loginRegisterButton:hover {
+   color: white;
+}
+
+#dev {
+   position: relative;
+   grid-area: showcase;
+   top: 100px;
+}
+
+#loggedInAs {
+   font-size: clamp(35px, 1.5vw, 2vw);
+   color: rgb(185, 185, 185);
+   background-color: rgba(255, 255, 255, 0);
+   position: relative;
+   align-self: top;
+   vertical-align: top;
+   grid-area: name;
+   box-sizing: border-box;
+   text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5);
+}
+
+/* PROFILE SCREEN BELOW */
+
+#profileScreen {
+   display: grid;
+   position: absolute;
+   align-items: center;
+   justify-items: center;
+   vertical-align: center;
+   top: 1em;
+   left: 1em;
+   height: calc(100vh - 2em);
+   width: calc(100vw - 2em);
+   grid-gap: 1em;
+   grid-template-areas:
+      "title title"
+      "customisation stats";
+   grid-template-columns: 1.5fr 1fr;
+   grid-template-rows: 1fr 10fr;
+   text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
+}
+
+#profileText {
+   font-size: 100px;
+   width: 100%;
+   height: 100%;
+   border-radius: 8px;
+   text-align: center;
+   justify-self: center;
+   justify-content: center;
+   color: white;
+   grid-area: title;
+}
+
+#profileBackButton {
+   font-size: 100px;
+   position: relative;
+   left: 0.25em;
+   justify-self: left;
+   color: white;
+   border-radius: 8px;
+   grid-area: title;
+}
+
+#profileStats {
+   position: relative;
+   grid-area: stats;
+   width: 100%;
+   height: 100%;
+   border-radius: 8px;
+   display: grid;
+   grid-template-areas:
+      "title"
+      "stats"
+      "footer";
+   
+   grid-template-rows: 1fr 3fr 3fr;
+}
+
+#profileStatsTitle {
+   font-size: 4rem;
+   text-align: center;
+   grid-area: title;
+}
+
+#profileStatsSection {
+   grid-area: stats;
+   display: grid;
+   width: 100%;
+   height: 100%;
+   align-items: center;
+   grid-template-areas: 
+      "highscore highscoreNumber"
+      "highwave highwaveNumber"
+      "games gamesNumber"
+      "shots shotsNumber";
+}
+
+.stat {
+   font-size: 2em;
+   text-align: center; 
+}
+
+#profileCustomisation {
+   position: relative;
+   grid-area: customisation;
+   width: 100%;
+   height: 100%;
+   border-radius: 8px;
+   display: grid;
+   grid-template-areas:
+      "title title"
+      "showcase color";
+   grid-template-rows: 1fr 6fr;
+}
+
+
+
+#profileColorContainer {
+   grid-area: color;
+   display: grid;
+   grid-template-areas:
+      "title"
+      "R"
+      "G"
+      "B";
+   grid-template-rows: auto;
+   align-items: center;
+   justify-items: center;
+}
+
+#profileColorTitle {
+   grid-area: title;
+   text-align: center;
+   font-size: 2rem;
+}
+
+#colorR {
+   grid-area: R;
+   transform: scale(0.8);
+}
+
+#colorG {
+   grid-area: G;
+   transform: scale(0.8);
+}
+
+#colorB {
+   grid-area: B;
+   transform: scale(0.8);
+}
+
+#profileCustomisationTitle {
+   text-align: center;
+   grid-area: title;
+   font-size: 4rem;
+}
+
+#characterShowcase {
+   grid-area: showcase;
+   display: grid;
+   grid-template-areas:
+      "character"
+      "name";
+}
+
+#profileName {
+   position: relative;
+   font-size: 2em;
+   grid-area: name;
+   text-align: center;
+}
+
+#profileCharacter {
+   grid-area: character;
+   align-self: center;
+   width: 50%;
+   height: auto;
+   justify-self: center;
+}
+
+
+
+/* LOGIN REGISTER SCREEN BELOW */
+
+#loginRegisterScreen {
+   width: 100vw;
+   height: 100vh;
+   z-index: 99;
+   background-color: rgba(0,0,0,0.5);
+   display: flex;
+   position: absolute;
+   top: 0px;
+   left: 0px;
+}
+
+
+
+#loginRegisterWindow {
+   display: grid;
+   padding: 1.5em;
+   justify-self: center;
+   align-self: center;
+   vertical-align: middle;
+   height: clamp(15em, 40%, 40%);
+   width: clamp(30em, 45%, 45%);
+   grid-template-areas:
+      "title title"
+      "form form"
+      "status status"
+      "login register";
+   grid-template-columns: 1fr 1fr;
+   grid-template-rows: 1fr 1.6fr 1fr 1fr;
+   grid-gap: 5px;
+   align-items: center;
+   justify-items: center;
+   box-shadow: 0px 0px 80px 3px rgba(0, 0, 0, 0.5); 
+   text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); 
+   position: relative;
+   border-radius: 0.5em;
+   background-color: rgba(53, 53, 53, 0.96);
+}
+
+#loginForm {
+   grid-area: form;
+   display: grid;
+   position: relative;
+   font-size: 50px;
+   grid-template-areas:
+      "username"
+      "password";
+   grid-gap: 5px;
+   width: 100%;
+   height: 100%;
+   justify-items: stretch;
+
+}
+
+
+#loginUsername {
+   grid-area: username;
+}
+
+
+#loginPassword {
+   grid-area: password;
+}
+
+.textinput {
+   position: relative;
+   width: 100%;
+   height: 80%;
+   color: rgb(215, 215, 215);
+   background-color: rgb(124, 124, 124);
+   border-radius: 0.4rem;
+   border: none;
+   font-size: 2.5rem;
+   padding: 0;
+   padding-left: 0.5rem;
+   font-family: 'Roboto', sans-serif;
+   font-weight: 300;
+}
+
+.textinput:focus-visible {
+   outline: none;
+}
+
+::placeholder {
+   opacity: 1;
+   color: rgb(185, 185, 185);
+   font-family: 'Roboto', sans-serif;
+   -webkit-appearance: none;
+}
+
+
+#loginRegisterTitle {
+   grid-area: title;
+   position: relative;
+   font-size: 5rem;
+   justify-self: stretch;
+   text-align: center;
+   background-color: rgb(26, 25, 23);
+   border-radius: 0.5rem;
+}
+
+#status {
+   grid-area: status;
+   position: relative;
+   background-color: rgb(80, 80, 80);
+   color: rgb(145, 145, 145);
+   border-radius: 0.5rem;
+   justify-self: stretch;
+   align-self: stretch;
+   text-align: center;
+   font-size: clamp(0.8rem, 1.2vw, 2rem);
+   font-weight: 300;
+   text-shadow: none;
+}
+
+#loginButton {
+   grid-area: login;
+   color: white;
+   position: relative;
+   font-size: 2vw;
+   font-weight: 100;
+   border: solid grey 0.35rem;
+   border-radius: 0.5rem;
+   border-color: rgba(255, 255, 255, 0.2);
+   justify-self: stretch;
+   align-self: center;
+   text-align: center;
+}
+
+#registerButton {
+   grid-area: register;
+   color: white;
+   position: relative;
+   font-size: 2vw;
+   font-weight: 100;
+   border: solid grey 0.35rem;
+   border-radius: 0.5rem;
+   border-color: rgba(255, 255, 255, 0.2);
+   justify-self: stretch;
+   text-align: center;
+}
+
+/* OPTIONS SCREEN BELOW */
+
+#optionsBackButton {
+   font-size: 50px;
+   position: relative;
+   padding-top: 0px;
+   padding-right: 10px;
+   padding-bottom: 0px;
+   padding-left: 10px;
+   text-align: middle;
+   vertical-align: middle;
+   color: white;
+   border: solid grey 2px;
+   border-radius: 12px;
+   grid-area: topleft;
+}
+
+#optionsScreen {
+   display: none;
+   grid-template-areas: /* options screen layout */
+      "topleft top top topright"
+      "midleft middle1 middle2 midright"
+      "midleft middle3 middle4 midright"
+      "bottomleft bottom bottom bottomright";
+   align-items: center;
+   justify-items: center;
+   vertical-align: middle;
+   height: 100vh;
+   grid-template-columns: 1fr 3fr 3fr 1fr;
+   grid-template-rows: 1fr 3fr 3fr 1fr;
+   text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
+}
+
+#optionsText {
+   font-size: 80px;
+   position: relative;
+   padding: 10px;
+   text-align: middle;
+   vertical-align: middle;
+   color: white;
+   grid-area: top;
+}
+
+#soundEffectsVolume {
+   position: relative;
+   grid-area: middle2;
+}
+
+#soundEffectsVolumeText {
+   position: relative;
+   left: 15px;
+   grid-area: middle1;
+   font-size: 60px;
+}
+
+#musicVolume {
+   position: relative;
+   grid-area: middle4;
+}
+
+#musicVolumeText {
+   position: relative;
+   left: 15px;
+   grid-area: middle3;
+   font-size: 60px;
+}
+
+.slider {
+   /* slider class for both sliders */
+   -webkit-appearance: none; /* remove default styling */
+   width: 100%;
+   height: 20px;
+   border-radius: 10px;
+   background: whitesmoke;
+   opacity: 0.5;
+}
+
+.slider:hover {
+   opacity: 0.8;
+}
+
+.slider::-webkit-slider-thumb {
+   /* slider draggable part */
+   -webkit-appearance: none; /* remove default styling */
+   appearance: none;
+   width: 50px;
+   height: 50px;
+   border-radius: 50%;
+   transition-duration: 0.05s;
+   background: rgb(110, 110, 110);
+}
+
+.slider::-webkit-slider-thumb:hover {
+   background: rgb(120, 120, 120);
+   transition-duration: 0.05s;
+}
+
+/* GAME OVER SCREEN BELOW */
+
+#gameOverScreen {
+   display: grid;
+   grid-template-areas: /* game over screen layout */
+      "topleft top top top topright"
+      "midleft rank player score midright"
+      "bottomleft bottom bottom bottom bottomright";
+   align-items: center;
+   justify-items: center;
+   vertical-align: middle;
+   height: 100vh;
+   grid-template-columns: 0.5fr 1fr 1fr 1fr 0.5fr;
+   grid-template-rows: 1fr 3fr 1fr;
+   box-shadow: 0px 0px 8px rgba(200, 200, 200, 0.8); /* GLOW FOR BUTTONS */
+   text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
+}
+
+#gameOver {
+   position: relative;
+   font-size: 80px;
+   text-align: center;
+   vertical-align: middle;
+   grid-area: top;
+}
+
+#gameOverScoreBoardRank {
+   position: relative;
+   font-size: 40px;
+   grid-area: rank;
+   justify-items: center;
+   text-align: top;
+   vertical-align: top;
+}
+
+#gameOverScoreBoardPlayer {
+   position: relative;
+   font-size: 40px;
+   grid-area: player;
+   justify-items: center;
+   text-align: top;
+   vertical-align: top;
+}
+
+#gameOverScoreBoardScore {
+   position: relative;
+   font-size: 40px;
+   grid-area: score;
+   justify-items: center;
+   text-align: top;
+   vertical-align: top;
+   align-items: top;
+}
+
+#returnToMenu {
+   font-size: 60px;
+   position: relative;
+   padding-top: 0px;
+   padding-right: 10px;
+   padding-bottom: 0px;
+   padding-left: 10px;
+   text-align: middle;
+   vertical-align: middle;
+   color: white;
+   border: solid grey 2px;
+   border-radius: 12px;
+   grid-area: bottom;
+}
+
+/* CLASSES */
+
+.bold {
+   font-weight: bold;
+}
+
+.title {
+   font-family: "Roboto Mono", monospace;
+}
+
+.red {
+   color: red;
+   text-shadow: 0px 0px 8px rgba(255, 0, 0, 0.5);
+}
+
+.green {
+   color: rgb(89, 255, 47);
+   text-shadow: 0px 0px 8px rgba(89, 255, 47, 0.5);
+}
+
+.orange {
+   color: orange;
+   text-shadow: 0px 0px 8px rgba(255, 165, 0, 0.5);
+}
+
+.flash {
+   animation: flash 0.8s ease-in-out;
+}
+
+.button:hover {
+   text-shadow: 0px 0px 15px rgba(255, 255, 255, 0.747);
+   transition-duration: 0.1s;
+   transform: scale(0.95);
+   opacity: 1.0;
+}
+
+.button {
+   border-radius: 8px;
+   background-color: rgba(255, 255, 255, 0);
+   transition-duration: 0.1s;
+   transform: scale(1);
+}
+
+.uipanel {
+   background-color: rgba(255,255,255,0.1);
+   border-radius: 8px;
+   transition-duration: 0.2s;
+}
+
+.uipanel:hover {
+   background-color: rgba(255,255,255,0.13);
+   transition-duration: 0.2s;
+}
+
+.sidebutton {
+   font-weight: 100;
+   border-radius: 6px;
+   background-color: rgba(255, 255, 255, 0);
+   transition-duration: 0.1s;
+   transform: scale(1);
+}
+
+.sidebutton:hover {
+   font-weight: 400;
+   text-shadow: 0px 0px 15px rgba(255, 255, 255, 0.747);
+   transition-duration: 0.1s;
+   transform: scale(0.95);
+   opacity: 1.0;
+}
+
+.important {
+   animation: rotating 3.5s ease-in-out infinite;
+}
+
+.important:hover {
+   animation: blink 2s infinite, rotating 3.5s ease-in-out infinite;
+   transition-duration: 0.1s;
+}
+
+.overlay {
+   z-index: 9;
+}
+
+/* ANIMS */
+
+@keyframes blink {
+   0% {
+      opacity: 1;
+   }
+   50% {
+      opacity: 0.6;
+   }
+   100% {
+      opacity: 1;
+   }
+}
+
+@keyframes flash {
+   0% {
+      opacity: 2;
+      background-color: rgba(255,255,255,0.2)
+   }
+
+   100% {
+      opacity: 1;
+      background-color: rgba(0,0,0,0)
+   }
+}
+
+@keyframes rotating {
+   0% {
+      transform: rotate(-1deg);
+   }
+   50% {
+      transform: rotate(1deg);
+   }
+   100% {
+      transform: rotate(-1deg);
+   }
+}
+
+@keyframes bulge {
+   0% {
+      transform: scale(1);
+   }
+   50% {
+      transform: scale(0.85);
+   }
+   100% {
+      transform: scale(1);
+   }
+}
+
+@keyframes spin {
+   0% {
+      transform: rotate(0deg);
+   }
+   100% {
+      transform: rotate(360deg);
+   }
+}
+
+@keyframes spinbig {
+   0% {
+      transform: rotate(0deg) scale(1.3);
+      background-color: rgba(0,0,0,0)
+   }
+   100% {
+      transform: rotate(360deg) scale(2);
+      background-color: rgba(0,0,0,0);
+   }
+}
+
+/* SCROLL BAR */
+
+/* width */
+::-webkit-scrollbar {
+   width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+   background: rgba(0, 0, 0, 0);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+   background: rgb(167, 166, 166);
+   border-radius: 6px;
+   transition-duration: 0.3s;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+   background: rgb(99, 99, 99);
+   transition-duration: 0.3s;
+}
