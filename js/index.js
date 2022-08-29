@@ -6,18 +6,23 @@ let waveCount = 0
 let gameState
 menuState = "titles"
 var bullets = []
-var enemyBullets = []
-var aliveEnemies = []
+var enemies = []
+let coins = []
 var deadEnemies = 0
 var regen = false
 let healthThreshold
 var enemyCollisionThisFrame = 0
 let goingToProfle = false
-
+let waveTrigger = false
+let goingToProfile = false
 //running js and parsing canvas
 connection()
-var canvas = document.querySelector("canvas")
+var canvas = document.getElementById("canvas")
 var c = canvas.getContext("2d")
+var profileCanvas = document.getElementById("profileCharacter")
+var pc = profileCanvas.getContext("2d")
+profileCanvas.width = 500
+profileCanvas.height = 500
 canvas.shadowBlur = 0
 canvas.width = innerWidth
 canvas.height = innerHeight
@@ -43,7 +48,11 @@ function Pythagoras(x1, y1, x2, y2) {
 	let yDistance = y2 - y1
 	return Math.sqrt(Math.pow(xDistance, 2 ) + Math.pow(yDistance, 2))
 }
-2
+//function to generate a random number between two numbers
+function Random(lower, upper) {
+	return Math.floor(Math.random() * (upper - lower + 1) + lower)
+}
+
 function playSoundEffect(filename){ //sound effect module, creates new sound object in document with filename passed in
 	let soundEffect = document.createElement("audio")
 	soundEffect.src = "./sounds/" + filename + ".wav" //filename set as sound source
@@ -126,7 +135,7 @@ class Client {
 		request.onerror = function(){ //error handle
 			console.log("There was an error with the request, are you connected to the internet?")
 		}
-		request.send()
+		request.send(params)
 	}
 
 	submitStats() {
@@ -184,8 +193,7 @@ function HealthRegen(regenSpeed) {
 
 function SpawnWave(number, radius) { //determines where enmies spawn, what difficulty they are
 	waveCount = waveCount + 1
-	aliveEnemies = []
-	deadEnemies = 0   
+	enemies = [] 
 	//"cluster" is the centre of where the enemies will spawn 
 	let cluster = {
 		x: player.x,
@@ -196,10 +204,10 @@ function SpawnWave(number, radius) { //determines where enmies spawn, what diffi
 	while (Pythagoras(cluster.x, cluster.y, player.x, player.y) <= 800) {
 		cluster.x = (Math.random() * innerWidth)
 		cluster.y = (Math.random() * innerHeight)
-		console.log("retry") //testing
+		//console.log("retry") //testing
 	}
 
-	console.log("cluster: " + cluster.x, cluster.y) //testing
+	//console.log("cluster: " + cluster.x, cluster.y) //testing
 
 	let enemySpawn = {
 		x: 0,
@@ -214,11 +222,12 @@ function SpawnWave(number, radius) { //determines where enmies spawn, what diffi
 		while ((enemySpawn.x >= innerWidth - 40) || (enemySpawn.x <= 40) || (enemySpawn.y >= innerHeight - 40) || (enemySpawn.y <= 40)) {
 			enemySpawn.x = cluster.x + Math.floor(Math.random() * radius) * (Math.round(Math.random()) ? 1 : -1) 
 			enemySpawn.y = cluster.y + Math.floor(Math.random() * radius) * (Math.round(Math.random()) ? 1 : -1) 
-			console.log("retry")
+			//console.log("retry")
 		}
-		aliveEnemies.push(new Enemy(enemySpawn.x, enemySpawn.y, 30, "rgb(220,60,35)", 100 + (waveCount * 3), 10 + (waveCount / 10), 5 + (waveCount / 3), 10 + (waveCount / 7), 2 + (waveCount / 6 )))
+		enemies.push(new Enemy(enemySpawn.x, enemySpawn.y, 30, "rgb(220,60,35)", 100 + (waveCount * 3), 10 + (waveCount / 10), 5 + (waveCount / 3), 10 + (waveCount / 7), 2 + (waveCount / 6 )))
 	}
 	playSoundEffect("new_wave")
+	waveTrigger = false
 }
 
 function determineRank() { //caluclates rank, displays on game over scoreboard
@@ -305,6 +314,8 @@ class Player { //player template
 		this.mass = 1.5
 		this.name = "Guest"
 		this.rank = 1
+		this.coins = 0
+		this.gun = new Gun(this.x, this.y, this.radius + 35, 30, "rgb(255,255,255)", 0)
 	}
 
 	draw() { //create circle
@@ -369,32 +380,113 @@ class Player { //player template
 
 	worldBorderCollision() { //screen edge collision - takes radius of cirlce into account
 		if (this.y > (canvas.height - this.radius - 1)){
-			this.yVelocity = 0 
+			this.yVelocity = -this.yVelocity 
 			this.y = canvas.height - this.radius - 1
 		}
 		if (this.y < (1 + this.radius)){
-			this.yVelocity = 0
+			this.yVelocity = -this.yVelocity 
 			this.y = 1 + this.radius
 		}
 		if (this.x > (canvas.width - this.radius - 1)){
-			this.xVelocity = 0
+			this.xVelocity = -this.xVelocity 
 			this.x = canvas.width - this.radius - 1
 		}
 		if (this.x < (1 + this.radius)){
-			this.xVelocity = 0
+			this.xVelocity = -this.xVelocity 
 			this.x = 1 + this.radius
 		}
 	}
 	update() { //calls draw and changes coords based on velocity - ease of use function
+		this.gun.update()
 		this.draw()
-
 		this.y = this.y + this.yVelocity * dt
 		this.x = this.x + this.xVelocity * dt
 	}
 }
 
+//create class for the character showcase in the profile screen so players can see what their character will look like and edit its color
+class CharacterShowcase {
+	constructor(radius, color) {
+		this.x = profileCanvas.width / 2
+		this.y = profileCanvas.height / 2
+		this.radius = radius
+		this.color = color
+		this.xVelocity = 0
+		this.yVelocity = 0
+	}
+
+
+
+	draw() { //create circle
+		pc.beginPath()
+		pc.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false) //circle
+		pc.strokeStyle = this.color
+		pc.fillStyle = this.color
+		pc.shadowBlur = this.radius / 3
+		pc.shadowColor = this.color
+		pc.lineWidth = 2
+		pc.stroke() //draw line of cirlce
+		pc.fill() //fill interior of circle
+		pc.closePath()
+	}
+
+	update() { //calls draw and changes coords based on velocity - ease of use function
+		let R = document.getElementById("colorR").value
+		let G = document.getElementById("colorG").value
+		let B = document.getElementById("colorB").value
+		this.color = "rgb(" + R + "," + G + "," + B + ")"
+		this.draw()
+		this.y = this.y + this.yVelocity * dt
+		this.x = this.x + this.xVelocity * dt
+	}
+
+}
+
+
+//create a grey rectangle which rotates around the player pointing in the direction of the mouse to represent the gun
+class Gun {
+	constructor(x, y, width, height, color, angle) {
+		this.x = x
+		this.y = y
+		this.width = width
+		this.height = height
+		this.color = color
+		this.angle = angle
+	}
+
+	recoil() {
+		this.width = this.width - 4
+		setTimeout(() => {  this.width = this.width + 4; }, 40)
+	}
+
+	draw() {
+		c.save()
+		c.translate(this.x, this.y)
+		c.rotate(this.angle)
+		c.beginPath()
+		c.rect(this.width / player.radius, this.height / player.radius - this.height / 2, this.width, this.height)
+		c.fillStyle = this.color
+		c.shadowColor = "white"
+		c.shadowBlur = player.radius / 4
+		c.fill()
+		c.closePath()
+		c.restore()
+	}
+
+	update() {
+		this.angle = Math.atan2(mouse.y - this.y, mouse.x - this.x)
+		this.x = player.x
+		this.y = player.y
+		this.draw()
+	}
+}
+
+
+
+
 class Bullet { //bullet template
-	constructor(x, y, radius, color, xVelocity, yVelocity, damage) {
+	constructor(team, x, y, radius, color, xVelocity, yVelocity, damage) {
+		this.team = team //team 1 is player, team 0 is enemy
 		this.x = x
 		this.y = y
 		this.radius = radius
@@ -403,6 +495,7 @@ class Bullet { //bullet template
 		this.yVelocity = yVelocity
 		this.mass = 0.05
 		this.damage = damage
+		this.bounce = 0
 	}
 
 	draw() { //see player class for notes
@@ -422,6 +515,118 @@ class Bullet { //bullet template
 
 		this.y = this.y + this.yVelocity * dt
 		this.x = this.x + this.xVelocity * dt
+	}
+}
+
+class Coin {
+	constructor(x, y) {
+		this.x = x
+		this.y = y
+		this.radius = 12
+		this.color = "rgb(245, 207, 17)"
+		this.xVelocity = Random(-100, 100) / 50
+		this.yVelocity = Random(-100, 100) / 50
+		this.pullRadius = 200
+		this.pullSpeed = 5
+		this.birth = Date.now()
+		this.time = Date.now() - this.birth
+		this.flash()
+	}
+
+	friction() { //slows object by a proportion of its current velocity
+		if (this.yVelocity > 0) {
+			this.yVelocity = this.yVelocity - (this.yVelocity / friction) * dt
+		}
+		if (this.xVelocity > 0) {
+			this.xVelocity = this.xVelocity - (this.xVelocity / friction) * dt
+		}
+		if (this.yVelocity < 0) {
+			this.yVelocity = this.yVelocity - (this.yVelocity / friction) * dt
+		}
+		if (this.xVelocity < 0) {
+			this.xVelocity = this.xVelocity - (this.xVelocity / friction) * dt
+		}
+	}
+
+	worldBorderCollision() { //see player class for notes
+		if (this.y > (canvas.height - this.radius)){
+			this.yVelocity = -this.yVelocity
+			this.y = canvas.height - this.radius
+		}
+
+		if (this.y < this.radius){
+			this.yVelocity = -this.yVelocity
+			this.y = this.radius
+		}
+
+		if (this.x > (canvas.width - this.radius)){
+			this.xVelocity = -this.xVelocity
+			this.x = canvas.width - this.radius
+		}
+
+		if (this.x < this.radius){
+			this.xVelocity = -this.xVelocity
+			this.x = this.radius
+		}
+	}
+
+	pull() {
+		let dist = Pythagoras(this.x, this.y, player.x ,player.y)
+		if (dist < this.pullRadius) {
+			if (dist <= player.radius) {
+				this.collect()
+				
+				
+			}
+			let xdiff = player.x - this.x
+			let ydiff = player.y - this.y
+			this.xVelocity += xdiff / (dist * this.pullSpeed) * dt
+			this.yVelocity += ydiff / (dist * this.pullSpeed) * dt
+			console.log("pulling")
+		}
+	}
+
+	collect() {
+		player.coins += 1
+		console.log("coin collected")
+		coins.splice(coins.indexOf(this), 1)
+		playSoundEffect("coin_collect")
+	}
+
+	flash() {
+		setTimeout(() => {
+			this.color = "rgb(247, 240, 185)"
+		}, 400)
+		setInterval(() => {
+
+			this.color = "rgb(245, 207, 17)"
+		}, 800)
+		setTimeout(() => {
+			setInterval(() => {
+				this.color = "rgb(247, 240, 185)"
+			}, 800)
+		}, 400)
+	}
+	draw() { //see player class for notes
+
+		c.beginPath()
+		c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
+		c.fillStyle = this.color
+		c.shadowBlur = this.radius / 4
+		c.shadowColor = this.color
+		c.lineWidth = 2
+		c.fill()
+	}
+
+	update() { //see player class for notes
+		this.time = Date.now() - this.birth
+		this.draw()
+		this.friction()
+		this.worldBorderCollision()
+		this.pull()
+		this.y = this.y + this.yVelocity * dt
+		this.x = this.x + this.xVelocity * dt
+		
 	}
 }
 
@@ -463,12 +668,22 @@ class Enemy { //enemy template
 		setTimeout(() => {  this.color = storedColor; }, 50)
 		
 	}
+
+	die(score) {
+		//playSoundEffect("enemy_die")
+		enemies.splice(enemies.indexOf(this), 1)
+		if (score === true) {
+			player.score += Math.floor(this.value)
+			coins.push(new Coin(this.x, this.y))
+			console.log("new coin")
+		}
+	}
 	shoot() { //method to shoot a bullet, called randomly
 		playSoundEffect("enemy_shoot")
 		let spread = (Math.random() - 0.5) * this.inaccuracy //enemy aim innacuracy affects bullet direction
 		let xvel = (player.x - this.x) / (Pythagoras(this.x, this.y, player.x, player.y)) * this.shotSpeed //calculate x dir of bullet - divide by dist to normalise
 		let yvel = (player.y - this.y) / (Pythagoras(this.x, this.y, player.x, player.y)) * this.shotSpeed //calculate y dir of bullet - divide by dist to normalise
-		enemyBullets.push(new Bullet(this.x, this.y, 5, "rgb(255,230,230)", xvel + spread, yvel + spread, this.shotDamage)) //push onto array
+		bullets.push(new Bullet(0, this.x, this.y, 5, "rgb(255,230,230)", xvel + spread, yvel + spread, this.shotDamage)) //push onto array
 	}
 
 	worldBorderCollision() { //see player class for notes
@@ -539,23 +754,78 @@ function gameplayLoop() {
 		player.friction()
 		player.movement()
 		//enemy bullet logic
-		enemyBullets.forEach((bullet, listPosition) => {
-			//detect collision
-			if (Pythagoras(bullet.x, bullet.y, player.x, player.y) < bullet.radius + player.radius) {
-				console.log("collision")
-				player.health = player.health - bullet.damage
-				player.hurt()
-				resolveCollision(player, bullet)
-				enemyBullets.splice(listPosition, 1)
+		bullets.forEach((bullet, listPosition) => {
+
+			if (bullet.team === 0) { //enemy bullet
+				if (Pythagoras(bullet.x, bullet.y, player.x, player.y) < bullet.radius + player.radius) {
+					console.log("collision")
+					player.health = player.health - bullet.damage
+					player.hurt()
+					resolveCollision(player, bullet)
+					bullets.splice(listPosition, 1)
+				}
 			}
-			//update position
+
+			if (bullet.team === 1) { //player bullet
+				if (bullet.radius != 0) {
+					enemies.forEach((enemy) => { //check each bullet against each enemy
+						if (enemy.radius != 0) {
+							if (Pythagoras(bullet.x, bullet.y, enemy.x, enemy.y) < bullet.radius + enemy.radius) { //collision check
+								enemy.health = enemy.health - player.shotDamage //lower enemy health
+								enemy.hurt()
+								resolveCollision(enemy, bullet)
+								enemy.update()
+								if (enemy.health <= 0) { //if dead, remove
+									enemy.radius = 0
+									enemy.xVelocity = 0
+									enemy.yVelocity = 0
+									enemy.die(true)
+									deadEnemies = deadEnemies + 1
+								}
+								bullets.splice(listPosition, 1) //remove bullet
+							} 
+						}
+					})
+	
+					if (bullet.bounce == 0) {
+						if (bullet.y > (canvas.height - bullet.radius - 1)){
+							bullet.yVelocity = -bullet.yVelocity 
+							bullet.y = canvas.height - bullet.radius - 1
+							bullet.bounce = 1
+							bullet.color = "rgba(255, 0, 0, 1)"
+							bullet.team = 0
+						}
+						if (bullet.y < (1 + bullet.radius)){
+							bullet.yVelocity = -bullet.yVelocity 
+							bullet.y = 1 + bullet.radius
+							bullet.bounce = 1
+							bullet.color = "rgba(255, 0, 0, 1)"
+							bullet.team = 0
+						}
+						if (bullet.x > (canvas.width - bullet.radius - 1)){
+							bullet.xVelocity = -bullet.xVelocity 
+							bullet.x = canvas.width - bullet.radius - 1
+							bullet.bounce = 1
+							bullet.color = "rgba(255, 0, 0, 1)"
+							bullet.team = 0
+						}
+						if (bullet.x < (1 + bullet.radius)){
+							bullet.xVelocity = -bullet.xVelocity 
+							bullet.x = 1 + bullet.radius
+							bullet.bounce = 1
+							bullet.color = "rgba(255, 0, 0, 1)"
+							bullet.team = 0
+						}
+					}
+				}
+			}
 			bullet.update()
 		})
 
 		
 
 		//enemy logic
-		aliveEnemies.forEach((enemy) => {
+		enemies.forEach((enemy) => {
 			if (enemy.health > 0) { //only execute if alive
 
 				
@@ -564,7 +834,7 @@ function gameplayLoop() {
 			}
 
 
-				aliveEnemies.forEach((enemy2) => { //check each enemy against each other enemy for collision
+				enemies.forEach((enemy2) => { //check each enemy against each other enemy for collision
 					if (Pythagoras(enemy.x, enemy.y, enemy2.x, enemy2.y) != 0){ //enemy avoidance AI
 						enemy.xVelocity = enemy.xVelocity + (enemy.x - enemy2.x) / Math.pow(Pythagoras(enemy.x, enemy.y, enemy2.x, enemy2.y), 2.1)
 						enemy.yVelocity = enemy.yVelocity + (enemy.y - enemy2.y) / Math.pow(Pythagoras(enemy.x, enemy.y, enemy2.x, enemy2.y), 2.1)
@@ -607,10 +877,9 @@ function gameplayLoop() {
 					enemy.health = 0 //kill enemy
 					if (enemy.health <= 0) { //remove enmy from gameplay if dead, array wiped at end of each wave
 						enemy.radius = 0
-						enemy.x = -100
-						enemy.y = -100
 						enemy.xVelocity = 0
 						enemy.yVelocity = 0
+						enemy.die(false)
 						deadEnemies = deadEnemies + 1
 					}
 				} 	
@@ -619,36 +888,12 @@ function gameplayLoop() {
 			enemy.update()		
 		})
 
-		bullets.forEach((bullet, listPosition) => { //player bullet logic
-			if (bullet.radius != 0) {
-
-
-				aliveEnemies.forEach((enemy) => { //check each bullet against each enemy
-					if (enemy.radius != 0) {
-						if (Pythagoras(bullet.x, bullet.y, enemy.x, enemy.y) < bullet.radius + enemy.radius) { //collision check
-							enemy.health = enemy.health - player.shotDamage //lower enemy health
-							enemy.hurt()
-							resolveCollision(enemy, bullet)
-							enemy.update()
-							if (enemy.health <= 0) { //if dead, remove
-								player.score = Math.round(player.score + enemy.value)
-								enemy.radius = 0
-								enemy.x = -100
-								enemy.y = -100
-								enemy.xVelocity = 0
-								enemy.yVelocity = 0
-								deadEnemies = deadEnemies + 1
-							}
-							bullets.splice(listPosition, 1) //remove bullet
-						} 
-					}
-				})
-			}
-			bullet.update()
+		coins.forEach((coin, listPosition) => { //player bullet logic
+			coin.update()
 		})
 
-		if (aliveEnemies.length === deadEnemies) { //if all enemies dead (number in the list = number killed), spawn next wave in 2.5s
-			deadEnemies = null
+		if (enemies.length === 0 && waveTrigger === false) { //if all enemies dead (number in the list = number killed), spawn next wave in 2.5s
+			waveTrigger = true
 			enemyCount = enemyCount + 1 //increase enemy count for next wave
 			setTimeout(SpawnWave, 2500, enemyCount, 100)
 		}
@@ -660,6 +905,7 @@ function gameplayLoop() {
 			document.getElementById("fps").innerHTML = "FPS: " + fps
 			document.getElementById("score").innerHTML = "SCORE " + player.score
 			document.getElementById("waves").innerHTML = "WAVE " + waveCount
+			document.getElementById("coins").innerHTML = "COINS " + player.coins
 		}
 		
 
@@ -668,12 +914,13 @@ function gameplayLoop() {
 		if (mouse.clicked === true && current - player.lastShot >= player.shotInterval) {
 			player.lastShot = new Date()
 			playSoundEffect("player_shoot")
+			player.gun.recoil()
 			let xvel = (mouse.x - player.x) / Pythagoras(mouse.x, mouse.y, player.x, player.y) * player.bulletSpeed //calculate x dir, divide by distance to normalise
 			let yvel = (mouse.y - player.y) / Pythagoras(mouse.x, mouse.y, player.x, player.y) * player.bulletSpeed //calculate x dir, divide by distance to normalise
 			var spread = Math.random() < 0.5 ? -0.2 : 0.2 //add spread
 			player.shotsfired = player.shotsfired + 1
 			console.log(player.shotsfired)
-			bullets.push(new Bullet(player.x, player.y, 10, "rgb(255,250,230)", xvel + spread, yvel + spread, player.shotDamage)) //push new bullet to array
+			bullets.push(new Bullet(1, player.x, player.y, 10, "rgb(255,250,230)", xvel + spread, yvel + spread, player.shotDamage)) //push new bullet to array
 		}
 		
 		c.fillStyle = bgColor
@@ -718,6 +965,9 @@ function gameplayLoop() {
 			document.getElementById("optionsScreen").style.display = "none"
 			document.getElementById("titleScreen").style.display = "none"
 			document.getElementById("loginRegisterScreen").style.display = "none"
+			pc.clearRect(0, 0, profileCanvas.width, profileCanvas.height);
+			character.update()
+			
 
 		} else if (menuState === "loginRegister") { //login/register screen
 			//set relevant HTML elements to visible or non-visible
@@ -755,6 +1005,11 @@ function gameplayLoop() {
 		document.getElementById("paused").style.display = "grid"
 		document.getElementById("titleScreen").style.display = "none"
 	}
+
+	if (canvas.width < canvas.height) {
+		gameState = "title screen"
+		menuState = "titles"
+	}
  }
 
 //variables for controls and listeners, hoisted but left here for relevance
@@ -771,7 +1026,7 @@ let soundEffect
 let playHover
 let savedScore = false
 let player
-
+let character
 
 
 //controls
@@ -938,8 +1193,8 @@ function getScores(){ //AJAX REQUEST: creates server GET request to retrieve the
 function resetValues() { //prepare new game by resetting values
 	savedScore = false
 	bullets = []
-	enemyBullets = []
-	aliveEnemies = []
+	coins = []
+	enemies = []
 	deadEnemies = 0
 	waveCount = 0
 	enemyCount = 0
@@ -979,6 +1234,7 @@ profileButton.addEventListener("click", () => {
 		menuState = "profile"
 	}
 	playSoundEffect("button")
+	character = new CharacterShowcase(100, "rgb(0,255,255)")
 })
 
 

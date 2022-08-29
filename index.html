@@ -26,7 +26,7 @@
 	<!--import css file-->
 	<link rel="stylesheet" href="./css/index.css">
 	<link rel="stylesheet" href="./css/mobile.css">
-	<title>PETERHOLL GAME</title>
+	<title>PETER HOLL</title>
 	<!--<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	-->
 	<meta name="description" content="PETERHOLL GAME MADE IN HIS MEMORY 1912-2020">
@@ -35,6 +35,7 @@
 </head>
 <body>
 	<p style="display: none;">Play now! Peterholl Game is an arcade-style shooter game with a global leaderboard!</p>
+	<P style="display: none;">possible names: reebound slapback shotts bulletback takeback neonback glowback</P>
 	<p style="display: none">peter holl peterholl shooter game peterholl game peterholl peter holl peter holl peterholl game peterholl game peterholl game peterholl game peterholl game peterholl game </p>
 	<p style="display: none">peter holl peterholl shooter game peterholl game peterholl peter holl peter holl peterholl game peterholl game peterholl game peterholl game peterholl game peterholl game </p>
 	<p style="display: none">peter holl peterholl shooter game peterholl game peterholl peter holl peter holl peterholl game peterholl game peterholl game peterholl game peterholl game peterholl game </p>
@@ -54,18 +55,22 @@
 
 	<div id="HUD">
 	<!--HUD items-->
-		<div id = "HP" style="color: white; ">HP</div>
-		<progress id="healthBar" value="100" max="100"></progress>
+		<div id = "HP" style="color: white; ">
+			<div id="HPtext">HP</div>
+			<progress id="healthBar" value="100" max="100"></progress>
+		</div>
+		
 		<div id="fps">FPS:</div>
 		<div id="score">SCORE 0</div>
 		<div id="waves">WAVE 0</div>
+		<div id="coins">COINS 0</div>
 	</div>
 
 	<div id ="titleScreen">
 	<!--title screen items-->
-		<div id="playButton" class="button important" >PLAY</div>
+		<div id="playButton" class="button important">PLAY</div>
 		<div id="loggedInAs" class="title tooltip">Playing as Guest</div>
-		<div id="gameTitle" class="title">PETERHOLL GAME</div>
+		<div id="gameTitle" class="title">UNNAMED ARCADE GAME</div>
 		<div id="leaderboard">
 			<div id="leaderboardTitle" class="title" >LEADERBOARD</div>
 			<img id="refreshScores" class="button" src="./images/refresh.png" alt="refresh scores" width="40" height="40">
@@ -162,7 +167,7 @@
 		<div id="profileCustomisation" class="uipanel">
 			<div id="profileCustomisationTitle">CHARACTER</div>
 			<div id="characterShowcase">
-				<img id="profileCharacter" src="../favicon.ico" alt="Player Character" width="100" height="100"></img>
+				<canvas id="profileCharacter"></canvas>
 				<div id="profileName">Username</div>
 			</div>
 			<div id="profileColorContainer">
