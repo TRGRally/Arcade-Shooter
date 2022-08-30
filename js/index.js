@@ -8,13 +8,16 @@ menuState = "titles"
 var bullets = []
 var enemies = []
 let coins = []
+let particles = []
 var deadEnemies = 0
+let goingToGameOver = false
 var regen = false
 let healthThreshold
 var enemyCollisionThisFrame = 0
 let goingToProfle = false
 let waveTrigger = false
 let goingToProfile = false
+let animStart
 //running js and parsing canvas
 connection()
 var canvas = document.getElementById("canvas")
@@ -316,6 +319,7 @@ class Player { //player template
 		this.rank = 1
 		this.coins = 0
 		this.gun = new Gun(this.x, this.y, this.radius + 35, 30, "rgb(255,255,255)", 0)
+		this.dead = false
 	}
 
 	draw() { //create circle
@@ -339,6 +343,15 @@ class Player { //player template
 		setTimeout(() => {  this.color = "rgb(63,155,214)"; }, 50)
 		console.log("player hurt")
 		var delay = setTimeout(HealthRegen, 5000, 500)
+	}
+
+	//explode on death
+	die() {
+		playSoundEffect("player_die")
+		this.dead = true
+		for (var i = 0; i < 40; i++) {
+			particles.push(new Particle(this.x, this.y, 10, this.color, Random(-10,10) / 5, Random(-10,10) / 5, 1000))
+		}
 	}
 
 	movement() { //WASD
@@ -398,6 +411,58 @@ class Player { //player template
 	}
 	update() { //calls draw and changes coords based on velocity - ease of use function
 		this.gun.update()
+		this.draw()
+		this.y = this.y + this.yVelocity * dt
+		this.x = this.x + this.xVelocity * dt
+	}
+}
+
+class Particle {
+	constructor(x, y, radius, color, xVelocity, yVelocity, length) {
+		this.x = x
+		this.y = y
+		this.radius = radius
+		this.color = color
+		this.xVelocity = xVelocity
+		this.yVelocity = yVelocity
+		this.length = length //ms to live
+		this.birth = Date.now()
+		this.time = 0
+		setTimeout(() => { 
+			this.radius = 0
+			particles.splice(particles.indexOf(this), 1)
+		}, this.length)
+	}
+
+	friction() { //slows object by a proportion of its current velocity
+		if (this.yVelocity > 0) {
+			this.yVelocity = this.yVelocity - (this.yVelocity / friction) * dt
+		}
+		if (this.xVelocity > 0) {
+			this.xVelocity = this.xVelocity - (this.xVelocity / friction) * dt
+		}
+		if (this.yVelocity < 0) {
+			this.yVelocity = this.yVelocity - (this.yVelocity / friction) * dt
+		}
+		if (this.xVelocity < 0) {
+			this.xVelocity = this.xVelocity - (this.xVelocity / friction) * dt
+		}
+	}
+
+	draw() { //create circle
+		c.globalAlpha = 1 - this.time
+		c.beginPath()
+		c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false) //circle
+		c.strokeStyle = this.color
+		c.fillStyle = this.color
+		c.lineWidth = 2
+		c.stroke() //draw line of cirlce
+		c.fill() //fill interior of circle
+		c.closePath()
+		c.globalAlpha = 1
+	}
+	update() { //calls draw and changes coords based on velocity - ease of use function
+		this.time = (Date.now() - this.birth) / this.length
 		this.draw()
 		this.y = this.y + this.yVelocity * dt
 		this.x = this.x + this.xVelocity * dt
@@ -596,16 +661,16 @@ class Coin {
 	flash() {
 		setTimeout(() => {
 			this.color = "rgb(247, 240, 185)"
-		}, 400)
+		}, 300)
 		setInterval(() => {
 
 			this.color = "rgb(245, 207, 17)"
-		}, 800)
+		}, 600)
 		setTimeout(() => {
 			setInterval(() => {
 				this.color = "rgb(247, 240, 185)"
-			}, 800)
-		}, 400)
+			}, 600)
+		}, 300)
 	}
 	draw() { //see player class for notes
 
@@ -666,12 +731,18 @@ class Enemy { //enemy template
 		this.color = "rgb(255,165,149)"	
 		playSoundEffect("enemy_hurt")
 		setTimeout(() => {  this.color = storedColor; }, 50)
+		for (var i = 0; i < 10; i++) {
+			particles.push(new Particle(this.x, this.y, 5, storedColor, Random(-7,7) / 10, Random(-7,7) / 10, 200))
+		}
 		
 	}
 
 	die(score) {
 		//playSoundEffect("enemy_die")
 		enemies.splice(enemies.indexOf(this), 1)
+		for (var i = 0; i < 10; i++) {
+			particles.push(new Particle(this.x, this.y, 10, this.color, Random(-10,10) / 10, Random(-10,10) / 10, 1000))
+		}
 		if (score === true) {
 			player.score += Math.floor(this.value)
 			coins.push(new Coin(this.x, this.y))
@@ -789,6 +860,9 @@ function gameplayLoop() {
 	
 					if (bullet.bounce == 0) {
 						if (bullet.y > (canvas.height - bullet.radius - 1)){
+							for(let i = 0; i < 3; i++){
+								particles.push(new Particle(bullet.x, bullet.y, 8, "rgba(255, 0, 0)", Random(-10,10) / 10, Random(-10,10) / 10, 500))
+							}
 							bullet.yVelocity = -bullet.yVelocity 
 							bullet.y = canvas.height - bullet.radius - 1
 							bullet.bounce = 1
@@ -796,6 +870,9 @@ function gameplayLoop() {
 							bullet.team = 0
 						}
 						if (bullet.y < (1 + bullet.radius)){
+							for(let i = 0; i < 3; i++){
+								particles.push(new Particle(bullet.x, bullet.y, 8, "rgba(255, 0, 0)", Random(-10,10) / 10, Random(-10,10) / 10, 500))
+							}
 							bullet.yVelocity = -bullet.yVelocity 
 							bullet.y = 1 + bullet.radius
 							bullet.bounce = 1
@@ -803,6 +880,9 @@ function gameplayLoop() {
 							bullet.team = 0
 						}
 						if (bullet.x > (canvas.width - bullet.radius - 1)){
+							for(let i = 0; i < 3; i++){
+								particles.push(new Particle(bullet.x, bullet.y, 8, "rgba(255, 0, 0)", Random(-10,10) / 10, Random(-10,10) / 10, 500))
+							}
 							bullet.xVelocity = -bullet.xVelocity 
 							bullet.x = canvas.width - bullet.radius - 1
 							bullet.bounce = 1
@@ -810,6 +890,9 @@ function gameplayLoop() {
 							bullet.team = 0
 						}
 						if (bullet.x < (1 + bullet.radius)){
+							for(let i = 0; i < 3; i++){
+								particles.push(new Particle(bullet.x, bullet.y, 8, "rgba(255, 0, 0)", Random(-10,10) / 10, Random(-10,10) / 10, 500))
+							}
 							bullet.xVelocity = -bullet.xVelocity 
 							bullet.x = 1 + bullet.radius
 							bullet.bounce = 1
@@ -892,6 +975,10 @@ function gameplayLoop() {
 			coin.update()
 		})
 
+		particles.forEach((particle, listPosition) => {
+			particle.update()
+		})
+
 		if (enemies.length === 0 && waveTrigger === false) { //if all enemies dead (number in the list = number killed), spawn next wave in 2.5s
 			waveTrigger = true
 			enemyCount = enemyCount + 1 //increase enemy count for next wave
@@ -927,8 +1014,9 @@ function gameplayLoop() {
 
 		player.update()
 		if (player.health <= 0){ //if player reaches 0HP, game over
-			playSoundEffect("player_die")
-			gameState = "game over"
+			player.die()
+			gameState = "dead"
+			animStart = new Date()
 		}
 	//set relevant HTML elements to visible or non-visible
 	document.getElementById("titleScreen").style.display = "none"
@@ -987,6 +1075,7 @@ function gameplayLoop() {
 		//check if score has been saved yet, if not, save it.
 		if (savedScore == false) {
 			savedScore = true
+			playSoundEffect("game_over")
 			submitScore()
 			client.submitStats()
 			setTimeout(() => {				//wait a short time between each network related function to allow bad response time
@@ -998,8 +1087,43 @@ function gameplayLoop() {
 			
 			
 		}
+	} else if (gameState === "dead") {
+		if (goingToGameOver == false) {
+			goingToGameOver = true
+			setTimeout(() => {
+				gameState = "game over"
+				document.getElementById("fadeToBlack").style.display = "none"
+				console.log("game overere")
+			}, 1600)
+		}
+		document.getElementById("fadeToBlack").style.display = "block"
+		console.log("fade to black")
+		
+
+		enemies.forEach(enemy => {
+			enemy.draw()
+		})
+
+		bullets.forEach(bullet => {
+			bullet.draw()
+		})
+
+		coins.forEach(coin => {
+			coin.draw()
+		})
+
+		particles.forEach(particle => {
+			particle.update()
+		})
+
+
+		let time = new Date() - animStart
+		time = (time / 900) -0.8
+		document.getElementById("fadeToBlack").style.opacity = time
+
 	} else if (gameState === "paused") { //pause menu
 		//set relevant HTML elements to visible or non-visible
+		
 		document.getElementById("gameOverScreen").style.display = "none"
 		document.getElementById("HUD").style.display = "none"
 		document.getElementById("paused").style.display = "grid"
@@ -1192,6 +1316,7 @@ function getScores(){ //AJAX REQUEST: creates server GET request to retrieve the
 
 function resetValues() { //prepare new game by resetting values
 	savedScore = false
+	goingToGameOver = false
 	bullets = []
 	coins = []
 	enemies = []

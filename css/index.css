@@ -717,19 +717,31 @@ td {
    transition-duration: 0.05s;
 }
 
+
+/* Death anim */
+#fadeToBlack {
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background-color: black;
+   transition-duration: 0.05s;
+}
+
 /* GAME OVER SCREEN BELOW */
 
 #gameOverScreen {
    display: grid;
    grid-template-areas: /* game over screen layout */
-      "topleft top top top topright"
+      "top top top top top"
       "midleft rank player score midright"
-      "bottomleft bottom bottom bottom bottomright";
+      "bottom bottom bottom bottom bottom";
    align-items: center;
    justify-items: center;
    vertical-align: middle;
    height: 100vh;
-   grid-template-columns: 0.5fr 1fr 1fr 1fr 0.5fr;
+   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
    grid-template-rows: 1fr 3fr 1fr;
    box-shadow: 0px 0px 8px rgba(200, 200, 200, 0.8); /* GLOW FOR BUTTONS */
    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
