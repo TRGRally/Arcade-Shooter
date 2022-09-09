@@ -1,0 +1,64 @@
+{
+    "enemies": [
+        {
+            "name": "default",
+            "type": "shooter",
+            "radius": 10,
+            "color": "red",
+            "health": 100,
+            "speed": 1,
+            "contactDamage": 1,
+            "bulletDamage": 10,
+            "shotSpeed": 1,
+            "bulletSpeed": 1,
+            "bulletSize": 1,
+            "bulletColor": "red",
+            "killScore": 10
+        },
+        {
+            "name": "charger",
+            "type": "melee",
+            "radius": 7,
+            "color": "orange",
+            "health": 50,
+            "speed": 5,
+            "contactDamage": 10,
+            "bulletDamage": 0,
+            "shotSpeed": 0,
+            "bulletSpeed": 0,
+            "bulletSize": 0,
+            "bulletColor": "red",
+            "killScore": 10
+        },
+        {
+            "name": "tank",
+            "type": "shooter",
+            "radius": 15,
+            "color": "darkblue",
+            "health": 400,
+            "speed": 0.2,
+            "contactDamage": 30,
+            "bulletDamage": 10,
+            "shotSpeed": 5,
+            "bulletSpeed": 2,
+            "bulletSize": 2,
+            "bulletColor": "red",
+            "killScore": 10
+        },
+        {
+            "name": "mage",
+            "type": "splash-target",
+            "radius": 10,
+            "color": "purple",
+            "health": 100,
+            "speed": 1,
+            "contactDamage": 1,
+            "bulletDamage": 10,
+            "shotSpeed": 0.5,
+            "bulletSpeed": 1,
+            "bulletSize": 1,
+            "bulletColor": "purple",
+            "killScore": 10
+        }
+    ]
+}

@@ -7,6 +7,7 @@ body {
    font-weight: 100;
    background-color: black;
    transition-duration: 0.1s;
+   overflow: hidden;
 }
 
 * {
@@ -113,6 +114,101 @@ body {
    font-size: 100px;
    grid-area: middle;
 }
+
+/* SHOP UI BELOW */
+
+#shop {
+   display: grid;
+   position: absolute;
+   grid-template-areas:
+      "padL title title title padR"
+      "padL upgrade1 upgrade2 heal padR"
+      "pad pad pad pad pad";
+   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+   grid-template-rows: 1fr 3fr 1fr;
+   grid-gap: 4em;
+   align-items: center;
+   justify-items: center;
+   vertical-align: middle;
+   height: 100%;
+   width: 100%;
+   top: 0;
+   left: 0;
+   background-color: rgba(0,0,0,0.5);
+   z-index: 100;
+   text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
+}
+
+
+#shopTitle {
+   grid-area: title;
+   align-self: center;
+   text-align: center;
+   font-size: 100px;
+}
+
+.upgradePanel {
+   display: grid;
+   grid-template-areas:
+      "title"
+      "icon"
+      "cost";
+   grid-template-rows: 1fr 3fr 1fr;
+   grid-gap: 1em;
+   align-items: center;
+   justify-items: center;
+   vertical-align: middle;
+   width: 100%;
+   height: 100%;
+   background-color: rgba(80,80,80,0.8);
+   border-radius: 16px;
+   transition-duration: 0.1s;
+}
+
+.upgradeHitbox:hover + .upgradePanel {
+   background-color: rgba(80,80,80,0.9);
+   transform: scale(1.05);
+   transition-duration: 0.1s;
+}
+
+.upgradeHitbox {
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   z-index: 100
+}
+
+.upgradeTitle {
+   grid-area: title;
+   align-self: center;
+   text-align: center;
+   justify-self: center;
+   vertical-align: middle;
+   font-size: clamp(35px, 1.8vw, 60px);
+   border-radius: 16px 16px 0px 0px;
+}
+
+.upgradeIcon {
+   grid-area: icon;
+   width: calc(100% - 4em);
+   height: auto;
+   align-self: center;
+   justify-self: center;
+   border-radius: 16px;
+   background-color: rgba(255,255,255,0.1);
+}
+
+.upgradeCost {
+   grid-area: cost;
+   align-self: center;
+   text-align: center;
+   justify-self: center;
+   font-size: 40px;
+   border-radius: 0px 0px 16px 16px;
+}
+
 
 /* TITLE SCREEN BELOW */
 
@@ -725,7 +821,7 @@ td {
    left: 0;
    width: 100%;
    height: 100%;
-   background-color: black;
+   background-color: rgb(26,25,23);
    transition-duration: 0.05s;
 }
 
@@ -950,6 +1046,38 @@ td {
       background-color: rgba(0,0,0,0);
    }
 }
+
+@keyframes appearFromBottom {
+   0% {
+      transform: translateY(100vh);
+      opacity: 0;
+   }
+   100% {
+      transform: translateY(0vh);
+      opacity: 1;
+   }
+}
+
+@keyframes disappearToBottom {
+   0% {
+      transform: translateY(100vh);
+      opacity: 1;
+   }
+   100% {
+      transform: translateY(0vh);
+      opacity: 0;
+   }
+}
+
+@keyframes fadeIn {
+   0% {
+      opacity: 0;
+   }
+   100% {
+      opacity: 1;
+   }
+}
+
 
 /* SCROLL BAR */
 
