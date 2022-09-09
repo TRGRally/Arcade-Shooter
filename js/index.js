@@ -1591,14 +1591,14 @@ refreshScoresButton.addEventListener("click", () => {
 const aboutButton = document.getElementById("aboutButton")
 aboutButton.addEventListener("click", () => {
 	playSoundEffect("/ui/button", 1)
-	open("http://www.peterholl.com/about")
+	open("https://trgrally.dev/about")
 })
 
 //MORE GAMES BUTTON//
 const moreGamesButton = document.getElementById("moreGamesButton")
 moreGamesButton.addEventListener("click", () => {
 	playSoundEffect("/ui/button", 1)
-	open("http://www.peterholl.com/gearhop")
+	open("https://trgrally.dev/gearhop")
 })
 
 //PROFILE BACK BUTTON
