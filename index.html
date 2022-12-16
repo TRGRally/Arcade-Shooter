@@ -26,19 +26,16 @@
 	<!--import css file-->
 	<link rel="stylesheet" href="./css/index.css">
 	<link rel="stylesheet" href="./css/mobile.css">
-	<title>PETER HOLL</title>
+	<title>SHOOTY GAME PEW PEW</title>
 	<!--<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	-->
-	<meta name="description" content="PETERHOLL GAME MADE IN HIS MEMORY 1912-2020">
-	<meta name="author" content="Peter Holl">
-	<meta name="keywords" content="Arcade, Shooter, game, peterholl game, peterholl, peter holl">
+	<meta name="description" content="RIP PETER HOLL 1912-2020">
+	<meta name="author" content="TRGRally">
+	<meta name="keywords" content="Arcade, Shooter, game, unnamed arcade shooter, trgrally, rally, therallygamer">
 </head>
 <body>
-	<p style="display: none;">Play now! Peterholl Game is an arcade-style shooter game with a global leaderboard!</p>
+	<p style="display: none;">Play now! Unnamed Arcade Game is an arcade-style shooter game with a global leaderboard!</p>
 	<P style="display: none;">possible names: reebound slapback shotts bulletback takeback neonback glowback</P>
-	<p style="display: none">peter holl peterholl shooter game peterholl game peterholl peter holl peter holl peterholl game peterholl game peterholl game peterholl game peterholl game peterholl game </p>
-	<p style="display: none">peter holl peterholl shooter game peterholl game peterholl peter holl peter holl peterholl game peterholl game peterholl game peterholl game peterholl game peterholl game </p>
-	<p style="display: none">peter holl peterholl shooter game peterholl game peterholl peter holl peter holl peterholl game peterholl game peterholl game peterholl game peterholl game peterholl game </p>
 
 	<div id="desktopReminder">
 		<div id="reminderText">Come back on desktop to play!</div>
@@ -61,6 +58,7 @@
 		</div>
 		
 		<div id="fps">FPS:</div>
+		<div id="name">NAME:</div>
 		<div id="score">SCORE 0</div>
 		<div id="waves">WAVE 0</div>
 		<div id="coins">COINS 0</div>
@@ -90,9 +88,13 @@
 	</div>
 	<div id ="titleScreen">
 	<!--title screen items-->
-		<div id="playButton" class="button important">PLAY</div>
-		<div id="loggedInAs" class="title tooltip">Playing as Guest</div>
-		<div id="gameTitle" class="title">PETERHOLL GAME</div>
+		<div id="playArea">
+			<div id="playButton" class="button important">PLAY</div>
+			<input id="nameBox" class="textinput" type="text" placeholder="Guest" autocomplete="off" spellcheck="false" autofocus="true" maxLength="16">
+		</div>
+		
+		<div id="loggedInAs" class="title tooltip">ANAL build v0.1 (semi-functional)</div>
+		<div id="gameTitle" class="title">UNNAMED ARCADE GAME</div>
 		<div id="leaderboard">
 			<div id="leaderboardTitle" class="title" >LEADERBOARD</div>
 			<img id="refreshScores" class="button" src="./images/refresh.png" alt="refresh scores" width="40" height="40">
@@ -107,7 +109,7 @@
 					<img id="profileButton" src="./images/profile.png" alt="profile" width="71%">
 					<span class="button-text">Profile</span>
 				</li>
-				
+			
 				<li class="sidebar-item sidebutton">
 					<img id="optionsButton" class="sidebutton" src="./images/options.png" alt="options" width="71%">
 					<span class="button-text">Options</span>
@@ -206,9 +208,11 @@
 	<div id="gameOverScreen" >
 	<!--game over screen items-->
 		<div id="gameOver" >GAME OVER</div>
-		<div id="gameOverScoreBoardRank"><span class='bold'>RANK</span><br><br>1<br><br>2<br><br>3<br><br>4<br><br>5</div>
-		<div id="gameOverScoreBoardPlayer">PLAYER</div>
-		<div id="gameOverScoreBoardScore">SCORE</div>
+		<div id="gameOverLeaderboard">
+			<div id="gameOverLeaderboardTitle" class="title" >LEADERBOARD</div>
+			<img id="gameOverRefreshScores" class="button" src="./images/refresh.png" alt="refresh scores" width="40" height="40">
+			<div id="gameOverLeaderboardContent"><table id="gameOverScoreTable"></table></div>
+		</div>
 		<div id="returnToMenu" class="button">RETURN TO MENU</div>
 	</div>
 </body>

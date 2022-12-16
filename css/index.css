@@ -10,6 +10,9 @@ body {
    overflow: hidden;
 }
 
+html, body, #gameOverLeaderboard { 
+   scroll-behavior: smooth
+}
 * {
    transition-duration: 0.1s;
 }
@@ -84,11 +87,27 @@ body {
 }
 
 #fps {
-   font-size: 15px;
+   font-size: 20px;
+   font-family: 'Roboto', sans-serif;
    position: absolute;
    top: 5px;
    right: 5px;
+   text-shadow: none;
+   font-weight: 300;
+   color: rgb(215, 215, 215);
 }
+
+#name {
+   font-size: 20px;
+   font-family: 'Roboto', sans-serif;
+   position: absolute;
+   top: 35px;
+   right: 5px;
+   text-shadow: none;
+   font-weight: 300;
+   color: rgb(215, 215, 215);
+}
+
 
 /* PAUSE MENU BELOW */
 
@@ -239,6 +258,11 @@ body {
    justify-self: start;
    background-color: rgba(255, 255, 255, 0.1);
    transition-duration: 0.2s;
+   overflow-y: scroll;
+}
+
+#sidebar::-webkit-scrollbar {
+   width: 0px;
 }
 
 #sidebar:hover {
@@ -295,6 +319,36 @@ body {
    grid-area: title;
    animation: rotating 15.5s ease-in-out infinite;
 }
+#playArea {
+   grid-area: play;
+   width: 100%;
+   height: 100%;
+   display: grid;
+   align-items: center;
+   justify-items: center;
+   vertical-align: middle;
+   grid-template-areas:
+      "play"
+      "name";
+   grid-gap: 2em;
+}
+
+#nameBox {
+   grid-area: name;
+   position: relative;
+   font-size: 2rem;
+   color: rgb(215, 215, 215);
+   align-self: start;
+   width: min(50%, 10vw);
+   height: min(2em, 8vh);
+   background-color: rgba(255, 255, 255, 0.1);
+   transition-duration: 0.1s;
+}
+
+#nameBox:hover {
+   background-color: rgba(255, 255, 255, 0.2);
+   transition-duration: 0.1s;
+}
 
 #playButton {
    font-size: max(5vw, 6px);
@@ -305,9 +359,17 @@ body {
    padding-left: 10px;
    text-decoration: none;
    text-align: middle;
+   align-self: end;
    color: white;
    grid-area: play;
    text-shadow: 0px 0px 15px rgba(255, 255, 255, 0.9), 0px 0px 50px rgba(255, 255, 255, 0.9);
+   background-color: rgba(255, 255, 255, 0.1);
+   transition-duration: 0.3s
+}
+
+#playButton:hover {
+   background-color: rgba(255, 255, 255, 0.2);
+   transition-duration: 0.3s;
 }
 
 #leaderboard {
@@ -401,12 +463,13 @@ td {
 }
 
 #loggedInAs {
-   font-size: clamp(35px, 1.5vw, 2vw);
+   font-size: clamp(28px, 1.3vw, 1.7vw);
    color: rgb(185, 185, 185);
    background-color: rgba(255, 255, 255, 0);
    position: relative;
    align-self: top;
    vertical-align: top;
+   top: -10px;
    grid-area: name;
    box-sizing: border-box;
    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5);
@@ -830,15 +893,18 @@ td {
 #gameOverScreen {
    display: grid;
    grid-template-areas: /* game over screen layout */
-      "top top top top top"
-      "midleft rank player score midright"
-      "bottom bottom bottom bottom bottom";
+      "title"
+      "scoreboard"
+      "bottom";
    align-items: center;
    justify-items: center;
    vertical-align: middle;
+   align-self: center;
+   justify-self: center;
+   margin: auto;
    height: 100vh;
-   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-   grid-template-rows: 1fr 3fr 1fr;
+   width: clamp(50rem, 0.5vw, 100rem);
+   grid-template-rows: 1fr 4fr 1fr;
    box-shadow: 0px 0px 8px rgba(200, 200, 200, 0.8); /* GLOW FOR BUTTONS */
    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
 }
@@ -848,35 +914,56 @@ td {
    font-size: 80px;
    text-align: center;
    vertical-align: middle;
-   grid-area: top;
+   grid-area: title;
 }
 
-#gameOverScoreBoardRank {
+#gameOverLeaderboard {
+   grid-area: scoreboard;
    position: relative;
-   font-size: 40px;
-   grid-area: rank;
-   justify-items: center;
-   text-align: top;
-   vertical-align: top;
+   font-size: 45px;
+   width: clamp(30rem, 80%, 85%);
+   height: 95%;
+   background-color: rgba(255, 255, 255, 0.1);
+   box-shadow: 0px 0px 4px rgba(255, 255, 255, 0.05);
+   color: white;
+   border-radius: 5px;
+   display: grid;
+   grid-template-areas:
+      "title"
+      "content";
+   grid-template-rows: 0.1fr, 2fr;
+   overflow-y: scroll;
 }
 
-#gameOverScoreBoardPlayer {
-   position: relative;
-   font-size: 40px;
-   grid-area: player;
-   justify-items: center;
-   text-align: top;
-   vertical-align: top;
+#gameOverScoreTable {
+   width: 100%;
+   overflow-y: scroll;
 }
 
-#gameOverScoreBoardScore {
+#gameOverLeaderboardTitle {
+   grid-area: title;
    position: relative;
-   font-size: 40px;
-   grid-area: score;
-   justify-items: center;
-   text-align: top;
-   vertical-align: top;
-   align-items: top;
+   font-size: 4rem;
+   text-align: center;
+}
+
+#gameOverLeaderboardContent {
+   grid-area: content;
+   font-size: 30px;
+   position: relative;
+   text-align: left;
+   padding: 1em;
+   padding-top: 0.15em;
+   
+}
+
+#gameOverRefreshScores {
+   position: relative;
+   align-self: start;
+   justify-self: left;
+   grid-area: title;
+   transition-duration: 0.1s;
+   opacity: 0.85;
 }
 
 #returnToMenu {
@@ -889,7 +976,7 @@ td {
    text-align: middle;
    vertical-align: middle;
    color: white;
-   border: solid grey 2px;
+   background-color:rgba(255, 255, 255, 0.1);
    border-radius: 12px;
    grid-area: bottom;
 }
@@ -898,6 +985,11 @@ td {
 
 .bold {
    font-weight: bold;
+}
+
+.greyed {
+   color:rgb(99, 99, 99);
+   text-shadow: 0px 0px 8px rgba(99, 99, 99, 0.5);
 }
 
 .title {
@@ -915,7 +1007,7 @@ td {
 }
 
 .orange {
-   color: orange;
+   color: gold;
    text-shadow: 0px 0px 8px rgba(255, 165, 0, 0.5);
 }
 
@@ -973,9 +1065,17 @@ td {
    transition-duration: 0.1s;
 }
 
+.blink {
+   animation: blink 1.5s infinite;
+}
+
 .overlay {
    z-index: 9;
 }
+
+.scrollpad {
+   scroll-margin-top: 60px;
+ }
 
 /* ANIMS */
 

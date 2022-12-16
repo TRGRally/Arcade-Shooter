@@ -20,6 +20,7 @@ let goingToProfile = false
 let animStart
 let upgrades
 let upgradesGenerated = false
+var bgColor = "rgba(26, 25, 23, 1)"
 //running js and parsing canvas
 connection()
 var canvas = document.getElementById("canvas")
@@ -66,14 +67,21 @@ addEventListener("resize", function() { //update render window size when the bro
 
 
 
-
 function Pythagoras(x1, y1, x2, y2) {
-	let xDistance = x2 - x1
-	let yDistance = y2 - y1
-	return Math.sqrt(Math.pow(xDistance, 2 ) + Math.pow(yDistance, 2))
+    if (typeof x1 === 'number' && typeof y1 === 'number' && typeof x2 === 'number' && typeof y2 === 'number') {
+        let xDistance = x2 - x1
+        let yDistance = y2 - y1
+        return Math.sqrt(Math.pow(xDistance, 2 ) + Math.pow(yDistance, 2))
+    }
+    else {
+        return False
+    }
 }
 //function to generate a random number between two numbers
 function Random(lower, upper) {
+	if (isNaN(lower) || isNaN(upper)) {
+		throw new Error('Both arguments must be numbers')
+	}
 	return Math.floor(Math.random() * (upper - lower + 1) + lower)
 }
 
@@ -84,14 +92,13 @@ function playSoundEffect(filename, volume){ //sound effect module, creates new s
 	soundEffect.play()
 }
 
-let vignette
-var bgColor = "rgba(26, 25, 23, 1)"
-function DrawBackground(){ //creates the background gradient, draws it
-	vignette = c.createRadialGradient(innerWidth / 2, innerHeight / 2, innerWidth / 1, innerWidth / 2, innerHeight / 2, innerWidth / 3) //vignette shape
-	vignette.addColorStop(0, "rgba(0, 0, 0, 1") //vignette inner colour
-	vignette.addColorStop(1, bgColor) //vignette outer colour
+
+function DrawBackground(){
+	let vignette = c.createRadialGradient(innerWidth / 2, innerHeight / 2, innerWidth / 1, innerWidth / 2, innerHeight / 2, innerWidth / 3)
+	vignette.addColorStop(0, "rgba(0, 0, 0, 1")
+	vignette.addColorStop(1, bgColor)
 	c.fillStyle = vignette
-	c.fillRect(0, 0, canvas.width, canvas.height) //fill
+	c.fillRect(0, 0, canvas.width, canvas.height)
 }
 
 let regenlock = false
@@ -103,12 +110,16 @@ function HealthRegen(regenSpeed) {
 			if (player.health < 100 && player.health >= movingThreshold - 1) { //if health hasnt decreased below threshold
 				player.health = player.health + 1		//increase player health
 				movingThreshold = movingThreshold + 1	//move threshold up by one
+				console.log('Increased Health')
 			} else {
 				clearInterval(regen)
 				regenlock = false						//unlock for next regen
+				console.log('Regen Complete')
 			}
 
 		}, regenSpeed)
+	} else {
+		console.log('Regen already in progress')
 	}
 }
 
@@ -135,7 +146,7 @@ function SpawnWave(number, radius) { //determines where enmies spawn, what diffi
 		y: 0
 	}
 
-	for (let i = 0; i < number; i++) {
+	for (let i = 0;   i < number; i++) {
 		//spawn enemy at random position in the cluster
 		enemySpawn.x = 0
 		enemySpawn.y = 0
@@ -148,7 +159,7 @@ function SpawnWave(number, radius) { //determines where enmies spawn, what diffi
 		if (i % 2 == 0) {
 			enemies.push(new Enemy(enemySpawn.x, enemySpawn.y, 30, "rgb(220,60,35)", 100 + (waveCount * 3), 10 + (waveCount / 10), 5 + (waveCount / 3), 10 + (waveCount / 7), 2 + (waveCount / 6 )))
 		} else {
-			enemies.push(new MeleeEnemy(enemySpawn.x, enemySpawn.y, 22, "rgb(204, 120, 4)", 30, 30, 3))
+			enemies.push(new MeleeEnemy(enemySpawn.x, enemySpawn.y, 22, "rgb(204, 120, 4)", 30, 30, 5))
 		}
 		
 		
@@ -157,35 +168,28 @@ function SpawnWave(number, radius) { //determines where enmies spawn, what diffi
 	waveTrigger = false
 }
 
-function determineRank() { //caluclates rank, displays on game over scoreboard
+//this function is used to determine a player's rank on the game over scoreboard
+//it is called when the game is over, and the player's rank is displayed in orange, blinking text
+
+function determineRank() {
+	//caluclates rank, displays on game over scoreboard
 	if (scoreData != null) { //check if data from server exists before attempting...
-		player.rank = 1
+		player.rank = 0
 		scoreData.forEach((entry) => {
 			if (player.score < entry.Score) {
 				player.rank = player.rank + 1
 			}
 		})
-		switch (player.rank) { //sets HTML depending on rank
-			case 1:
-				document.getElementById("gameOverScoreBoardRank").innerHTML = "<span class='bold'>RANK</span><br><br><span class='bold red'>1: YOU</span><br><br>2<br><br>3<br><br>4<br><br>5"
-				break
-			case 2:
-				document.getElementById("gameOverScoreBoardRank").innerHTML = "<span class='bold'>RANK</span><br><br>1<br><br><span class='bold red'>2: YOU</span><br><br>3<br><br>4<br><br>5"
-				break
-			case 3:
-				document.getElementById("gameOverScoreBoardRank").innerHTML = "<span class='bold'>RANK</span><br><br>1<br><br>2<br><br><span class='bold red'>3: YOU</span><br><br>4<br><br>5"
-				break
-			case 4:
-				document.getElementById("gameOverScoreBoardRank").innerHTML = "<span class='bold'>RANK</span><br><br>1<br><br>2<br><br>3<br><br><span class='bold red'>4: YOU</span><br><br>5"
-				break
-			case 5:
-				document.getElementById("gameOverScoreBoardRank").innerHTML = "<span class='bold'>RANK</span><br><br>1<br><br>2<br><br>3<br><br>4<br><br><span class='bold red'>5: YOU</span>"
-				break
-			default: //if not ranked 1-5, do:
-				document.getElementById("gameOverScoreBoardRank").innerHTML = "<span class='bold'>RANK</span><br><br>1<br><br>2<br><br>3<br><br>4<br><br>5<br><br><span class='bold red'>" + player.rank + ": YOU</span>"
-				document.getElementById("gameOverScoreBoardPlayer").innerHTML = document.getElementById("gameOverScoreBoardPlayer").innerHTML + "<br><br>" + player.name
-				document.getElementById("gameOverScoreBoardScore").innerHTML = document.getElementById("gameOverScoreBoardScore").innerHTML + "<br><br>" + player.score
-		}
+		let table = document.getElementById("gameOverScoreTable")
+		let rows = table.querySelectorAll("tr")
+		let current = rows.item(player.rank)
+		current.classList.add("orange")
+		current.classList.add("blink")
+		current.classList.add("scrollpad")
+		
+		setTimeout(
+			() => current.scrollIntoView({block: "start", behavior: "smooth"})
+		, 1200)
 	} else {
 		console.log("score data not retrieved... are you connected to the internet?")
 	}
@@ -249,7 +253,7 @@ function resolveCollision(o1, o2) { //collision handler, passes 2 objects in wit
 class Client {
 	constructor() {
 		this.auth = false
-		this.username = "Default"
+		this.username = "Guest"
 		this.highscore = 0
 		this.highwave = 0
 		this.gamesplayed = 0
@@ -328,9 +332,7 @@ class Client {
 
 	submitStats() {
 		var _this = this
-		console.log(this.ganesplayed)
 		this.gamesplayed = this.gamesplayed + 1
-		console.log(this.gamesplayed)
 		this.shotsfired = this.shotsfired + player.shotsfired
 		if (player.score > _this.highscore) {
 			_this.highscore = player.score
@@ -385,7 +387,7 @@ class Player { //player template
 		this.name = "Guest"
 		this.rank = 1
 		this.coins = 0
-		this.gun = new Gun(this.x, this.y, this.radius + 35, 30, "rgb(255,255,255)", 0)
+		this.gun = new Gun(c, this, this.radius + 35, 30, "rgb(255,255,255)")
 		this.dead = false
 		this.upgrades = []
 		this.weapon = "default_gun"
@@ -410,7 +412,6 @@ class Player { //player template
 		healthThreshold = player.health
 		
 		setTimeout(() => {  this.color = "rgb(63,155,214)"; }, 50)
-		console.log("player hurt")
 		var delay = setTimeout(HealthRegen, 5000, 500)
 	}
 
@@ -554,6 +555,49 @@ class Particle {
 	}
 }
 
+
+
+//create a grey rectangle which rotates around the player pointing in the direction of the mouse to represent the gun
+class Gun {
+	constructor(c, parent, width, height, color) {
+		this.c = c
+		this.parent = parent
+		this.x = parent.x
+		this.y = parent.y
+		this.width = width
+		this.height = height
+		this.color = color
+		this.angle = 1
+	}
+
+	recoil() {
+		this.width = this.width - 4
+		setTimeout(() => {  this.width = this.width + 4; }, 40)
+	}
+
+	draw() {
+		c = this.c
+		c.save()
+		c.translate(this.x, this.y)
+		c.rotate(this.angle)
+		c.beginPath()
+		c.rect(this.width / this.parent.radius, this.height / this.parent.radius - this.height / 2, this.width, this.height)
+		c.fillStyle = this.color
+		c.shadowColor = "white"
+		c.shadowBlur = this.parent.radius / 4
+		c.fill()
+		c.closePath()
+		c.restore()
+	}
+
+	update() {
+		this.angle = Math.atan2(mouse.y - this.y, mouse.x - this.x)
+		this.x = this.parent.x
+		this.y = this.parent.y
+		this.draw()
+	}
+}
+
 //create class for the character showcase in the profile screen so players can see what their character will look like and edit its color
 class CharacterShowcase {
 	constructor(radius, color) {
@@ -563,6 +607,7 @@ class CharacterShowcase {
 		this.color = color
 		this.xvel = 0
 		this.yvel = 0
+		this.gun = new Gun(pc, this, this.radius + 35, 30, "rgb(255,255,255)")
 	}
 
 
@@ -588,47 +633,9 @@ class CharacterShowcase {
 		this.draw()
 		this.y = this.y + this.yvel * dt
 		this.x = this.x + this.xvel * dt
+		this.gun.update()
 	}
 
-}
-
-
-//create a grey rectangle which rotates around the player pointing in the direction of the mouse to represent the gun
-class Gun {
-	constructor(x, y, width, height, color, angle) {
-		this.x = x
-		this.y = y
-		this.width = width
-		this.height = height
-		this.color = color
-		this.angle = angle
-	}
-
-	recoil() {
-		this.width = this.width - 4
-		setTimeout(() => {  this.width = this.width + 4; }, 40)
-	}
-
-	draw() {
-		c.save()
-		c.translate(this.x, this.y)
-		c.rotate(this.angle)
-		c.beginPath()
-		c.rect(this.width / player.radius, this.height / player.radius - this.height / 2, this.width, this.height)
-		c.fillStyle = this.color
-		c.shadowColor = "white"
-		c.shadowBlur = player.radius / 4
-		c.fill()
-		c.closePath()
-		c.restore()
-	}
-
-	update() {
-		this.angle = Math.atan2(mouse.y - this.y, mouse.x - this.x)
-		this.x = player.x
-		this.y = player.y
-		this.draw()
-	}
 }
 
 
@@ -737,7 +744,6 @@ class Coin {
 
 	collect() {
 		player.coins += 1
-		console.log("coin collected")
 		coins.splice(coins.indexOf(this), 1)
 		playSoundEffect("coin_collect", 1)
 	}
@@ -832,7 +838,6 @@ class Enemy { //enemy template
 		if (score === true) {
 			player.score += Math.floor(this.value)
 			coins.push(new Coin(this.x, this.y))
-			console.log("new coin")
 		}
 	}
 	shoot() { //method to shoot a bullet, called randomly
@@ -867,11 +872,11 @@ class Enemy { //enemy template
 
 	ai() {
 		//target the player
-		if (this.xvel < this.speedCap) {
+		if (Math.abs(this.xvel) < this.speedCap) {
 			this.xvel = this.xvel - ((this.x - player.x) / Pythagoras(this.x, this.y, player.x, player.y) / 50) * dt
 		}
 	
-		if (this.yvel < this.speedCap) {
+		if (Math.abs(this.yvel) < this.speedCap) {
 			this.yvel = this.yvel - ((this.y - player.y) / Pythagoras(this.x, this.y, player.x, player.y) / 50) * dt
 		}
 
@@ -882,6 +887,11 @@ class Enemy { //enemy template
 		
 		if (this.xvel != 0) {
 			this.xvel = this.xvel - (this.xvel / friction) * dt
+		}
+
+		//shoot
+		if (Math.round(Math.random() * (1000 - (40 * waveCount )) * dt) === 0) { //random shot calculation
+			this.shoot()
 		}
 
 		//detect player-this collision
@@ -918,21 +928,20 @@ class MeleeEnemy extends Enemy {
 		super(x, y, radius, color, health, 0, 0, contactDamage, speedCap)
 		this.xvel = 0
 		this.yvel = 0
-		this.mass = 5
+		this.mass = 0.5
 		this.value = this.contactDamage + this.speedCap
 	}
 
 
 	ai() {
 		//target the player
-		if (this.xvel < this.speedCap) {
-			this.xvel = this.xvel - ((this.x - player.x) / Pythagoras(this.x, this.y, player.x, player.y) /20) * dt
+		if (Math.abs(this.xvel) < this.speedCap) {
+			this.xvel = this.xvel - ((this.x - player.x) / Pythagoras(this.x, this.y, player.x, player.y) / 30) * dt
 		}
-
-		if (this.yvel < this.speedCap) {
-			this.yvel = this.yvel - ((this.y - player.y) / Pythagoras(this.x, this.y, player.x, player.y) / 20) * dt
+	
+		if (Math.abs(this.yvel) < this.speedCap) {
+			this.yvel = this.yvel - ((this.y - player.y) / Pythagoras(this.x, this.y, player.x, player.y) / 30) * dt
 		}
-		console.log("melee ai")
 		//friction
 		if (this.yvel != 0) {
 			this.yvel = this.yvel - (this.yvel / friction) * dt
@@ -1005,17 +1014,14 @@ function gameplayLoop() {
 		player.movement()
 		//enemy bullet logic
 		bullets.forEach((bullet, listPosition) => {
-
 			if (bullet.team === 0) { //enemy bullet
 				if (Pythagoras(bullet.x, bullet.y, player.x, player.y) < bullet.radius + player.radius) {
-					console.log("collision")
 					player.health = player.health - bullet.damage
 					player.hurt()
 					resolveCollision(player, bullet)
 					bullets.splice(listPosition, 1)
 				}
 			}
-
 			if (bullet.team === 1) { //player bullet
 				if (bullet.radius != 0) {
 					enemies.forEach((enemy) => { //check each bullet against each enemy
@@ -1036,7 +1042,6 @@ function gameplayLoop() {
 							} 
 						}
 					})
-	
 					if (bullet.bounce == 0) {
 						if (bullet.y > (canvas.height - bullet.radius - 1)){
 							for(let i = 0; i < 3; i++){
@@ -1083,19 +1088,11 @@ function gameplayLoop() {
 			}
 			bullet.update()
 		})
-
-		
-
 		//enemy logic
 		enemies.forEach((enemy) => {
 			if (enemy.health > 0) { //only execute if alive
 
-				
-			if (Math.round(Math.random() * (1000 - (40 * waveCount )) * dt) === 0) { //random shot calculation
-				enemy.shoot()
-			}
-
-
+				enemy.ai()	//execute enemy AI
 				enemies.forEach((enemy2) => { //check each enemy against each other enemy for collision
 					if (Pythagoras(enemy.x, enemy.y, enemy2.x, enemy2.y) != 0){ //enemy avoidance AI
 						enemy.xvel = enemy.xvel + (enemy.x - enemy2.x) / Math.pow(Pythagoras(enemy.x, enemy.y, enemy2.x, enemy2.y), 2.1)
@@ -1109,38 +1106,28 @@ function gameplayLoop() {
 							
 					} 
 					
-				})
-				
-				enemy.ai()	//execute enemy AI
-					
-				
-				
+				})		
 			}
 			enemy.worldBorderCollision()
 			enemy.update()		
 		})
-
 		coins.forEach((coin, listPosition) => { //player bullet logic
 			coin.update()
 		})
-
 		particles.forEach((particle, listPosition) => {
 			particle.update()
 		})
-
 		if (enemies.length === 0 && waveTrigger === false) { //if all enemies dead (number in the list = number killed), spawn next wave in 2.5s
 			waveTrigger = true
 			enemyCount = enemyCount + 1 //increase enemy count for next wave
-			if (waveCount % 1 == 1000 && waveCount != 0) { //every 5 waves, show the shop
+			if (waveCount % 500 == 0 && waveCount != 0) { //every 5 waves, show the shop
 				setTimeout(() => {
 					upgradesGenerated = false
 					gameState = "shop"
 				}, 1750)
 			} else {
 				setTimeout(SpawnWave, 2500, enemyCount, 100)
-			}
-			
-			
+			}	
 		}
 		//HUD updates
 		const healthBar = document.getElementById("healthBar")
@@ -1148,13 +1135,11 @@ function gameplayLoop() {
 		
 		if (framecount % 10 == 0) {
 			document.getElementById("fps").innerHTML = "FPS: " + fps
+			document.getElementById("name").innerHTML = "NAME: " + player.name
 			document.getElementById("score").innerHTML = "SCORE " + player.score
 			document.getElementById("waves").innerHTML = "WAVE " + waveCount
 			document.getElementById("coins").innerHTML = "COINS " + player.coins
 		}
-		
-
-
 		let current = new Date()
 		if (mouse.clicked === true && current - player.lastShot >= player.shotInterval) {
 			player.lastShot = new Date()
@@ -1164,10 +1149,8 @@ function gameplayLoop() {
 			let yvel = (mouse.y - player.y) / Pythagoras(mouse.x, mouse.y, player.x, player.y) * player.bulletSpeed //calculate x dir, divide by distance to normalise
 			var spread = Math.random() < 0.5 ? -0.2 : 0.2 //add spread
 			player.shotsfired = player.shotsfired + 1
-			console.log(player.shotsfired)
 			bullets.push(new Bullet(1, player.x, player.y, 10, "rgb(255,250,230)", xvel + spread, yvel + spread, player.shotDamage)) //push new bullet to array
-		}
-		
+		}	
 		c.fillStyle = bgColor
 
 		player.update()
@@ -1251,28 +1234,36 @@ function gameplayLoop() {
 		if (savedScore == false) {
 			savedScore = true
 			playSoundEffect("game_over", 1)
-			submitScore()
-			client.submitStats()
-			setTimeout(() => {				//wait a short time between each network related function to allow bad response time
-				getScores()
-				setTimeout(() => {
-						determineRank()
-				}, 200)
-			}, 200)
-			
+			getScores()
+			console.log("getting scores")
+			setTimeout(() => {
+				console.log("determining rank")
+				determineRank()
+			}, 500)
 			
 		}
+			
+		
+		
+		
+			//client.submitStats()
+
+
+		
+			
+		
 	} else if (gameState === "dead") {
 		if (goingToGameOver == false) {
 			goingToGameOver = true
+			submitScore()
+			console.log("submitting score")
 			setTimeout(() => {
 				gameState = "game over"
 				document.getElementById("fadeToBlack").style.display = "none"
 				console.log("game overere")
-			}, 1900)
+			}, 1000)
 		}
 		document.getElementById("fadeToBlack").style.display = "block"
-		console.log("fade to black")
 		
 
 		enemies.forEach(enemy => {
@@ -1329,7 +1320,6 @@ function gameplayLoop() {
 		})
 		if (upgradesGenerated === false) {
 			upgradesGenerated = true
-			console.log("thing")
 			//choose shop items to display
 			pickShopItems()
 			document.getElementById("upgrade1Title").innerHTML = client.upgrade1.description
@@ -1483,13 +1473,8 @@ playButton.addEventListener("click", () => {
 	player = new Player(innerWidth / 2, innerHeight / 1.8, 42, "rgb(63,155,214)", 0, -1, 100) //makes new player
 	gameState = "playing" //changes game state to playing
 	playSoundEffect("/ui/play_button", 1)
-	if (client.auth == true){ //checks if the name box is empty, if yes, sets default name. if no, copies name to player
-		player.name = client.username
-		client.getStats()
-	} else {
-		player.name = "Guest"
-	}
-	
+	player.name = document.getElementById("nameBox").value || "Guest"
+	console.log(player.name)
 })
 
 //OPTIONS BUTTON//
@@ -1512,6 +1497,7 @@ optionsBackButton.addEventListener("click", () => {
 
 
 //PROFILE BUTTON//
+
 const profileButton = document.getElementById("profileButton")
 profileButton.addEventListener("click", () => {
 	
@@ -1532,6 +1518,12 @@ profileButton.addEventListener("click", () => {
 const discordButton = document.getElementById("discordButton")
 discordButton.addEventListener("click", () => {
 	window.open("https://discord.gg/k5Grv8F")
+	playSoundEffect("/ui/button", 1)
+})
+//GITHUB BUTTON//
+const githubButton = document.getElementById("githubButton")
+githubButton.addEventListener("click", () => {
+	window.open("https://github.com/TRGRally")
 	playSoundEffect("/ui/button", 1)
 })
 
@@ -1556,9 +1548,9 @@ loginButton.addEventListener("click", () => {
 	let password = document.getElementById("loginPassword").value
 	console.log(username, password)
 	client.login(username, password)
-	console.log("login button pressed")
 	playSoundEffect("/ui/button", 1)
 })
+loginRegisterButton.style.display = "none"
 
 //register BUTTON//
 const registerButton = document.getElementById("registerButton")
@@ -1628,7 +1620,6 @@ upgrade1Hitbox.addEventListener("click", () => {
 		playSoundEffect("/ui/button", 1)
 		upgrade2.style.animation = "disappearToBottom 0.3s ease-in-out"
 		heal.style.animation = "disappearToBottom 0.3s ease-in-out"
-		console.log("upgrade1 applied")
 		setTimeout(() => {
 			gameState = "playing"
 		}, 300)
@@ -1688,7 +1679,6 @@ document.addEventListener("mouseout", (event) => {
 	if (event.target.matches(".button") || event.target.matches(".sidebutton") || event.target.matches(".upgradeHitbox")) {
 		const button = event.target
 		playSoundEffect("/ui/button_mouseout", 0.1)
-		console.log("mouseout")
 	}
 })
 
@@ -1712,10 +1702,8 @@ document.addEventListener("mouseout", (event) => {
 
 
 
-function submitScore(){ //AJAX REQUEST: creates server POST request to store the player's score and name into the database
-	savedScore = true
-	let scoreDate = Date.now()
-	var params = "name=" + player.name + "&" + "score=" + player.score + "&" + "timestamp=" + scoreDate //format params for the POST request
+async function submitScore(){ //AJAX REQUEST: creates server POST request to store the player's score and name into the database
+	var params = "name=" + player.name + "&" + "score=" + player.score //format params for the POST request
 	var request = new XMLHttpRequest() //create new request
 	request.open("POST", "../php/submitScore.php", true) //set to POST request, call php file
 	request.setRequestHeader("Content-type", "application/x-www-form-urlencoded") //set request format
@@ -1736,7 +1724,7 @@ function submitScore(){ //AJAX REQUEST: creates server POST request to store the
 	request.send(params)
 }
 
-function getScores(){ //AJAX REQUEST: creates server GET request to retrieve the stored scores information form the database
+async function getScores(){ //AJAX REQUEST: creates server GET request to retrieve the stored scores information form the database
 	var request = new XMLHttpRequest() //create new request
 	request.open("GET", "../php/getScores.php", true) //set GET request
 	request.setRequestHeader("Content-type", "application/x-www-form-urlencoded") //set request type
@@ -1765,20 +1753,27 @@ function getScores(){ //AJAX REQUEST: creates server GET request to retrieve the
 				}
 				document.getElementById("leaderboardContent").innerHTML += "</table>"
 
-			} else if (gameState === "game over") { //if on game over, show on game over screen
-
-				document.getElementById("gameOverScoreBoardPlayer").innerHTML = "<span class='bold'>PLAYER</span>"
-				document.getElementById("gameOverScoreBoardScore").innerHTML = "<span class='bold'>SCORE</span>"
-
-				for (let entry = 0; entry < 5; entry++) { //go through top 5 scores, set HTML iteratively
-				
-					document.getElementById("gameOverScoreBoardPlayer").innerHTML = document.getElementById("gameOverScoreBoardPlayer").innerHTML + "<br><br>" + scoreData[entry].Player
-					document.getElementById("gameOverScoreBoardScore").innerHTML = document.getElementById("gameOverScoreBoardScore").innerHTML + "<br><br>" + scoreData[entry].Score
-
-				}
+			} else if (gameState === "game over" || gameState === "dead") { //if on game over, show on game over screen
+				let table = document.getElementById("gameOverScoreTable")
+				table.innerHTML = ""
+				for (let entry = 0; entry < scoreData.length; entry++) {
+					let rank = entry + 1
+					let row = table.insertRow(entry)
+					let rankCell = row.insertCell(0)
+					let playerCell = row.insertCell(1)
+					let scoreCell = row.insertCell(2)
+					rankCell.innerHTML = `${rank}.`
+					if (client.auth === true && client.username == scoreData[entry].Player) {
+						let boldname = `<b>${scoreData[entry].Player}</b>`
+						playerCell.innerHTML = boldname
+					} else {
+						playerCell.innerHTML = scoreData[entry].Player
+					}
+					scoreCell.innerHTML = scoreData[entry].Score
 			}
-		} else if (this.status == 404){ //404 = no file code
+			} else if (this.status == 404){ //404 = no file code
 			console.log("Error 404, file not found.")
+			}
 		}
 	}
 

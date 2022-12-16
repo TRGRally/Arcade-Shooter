@@ -29,10 +29,15 @@
             font-family: 'Noto Sans', sans-serif;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        footer {
+            align-self: center;
         }
 
         p {
-            max-width: 65ch;
+            width: min(93%, 65ch);
             align-self: center;
         }
 
@@ -51,6 +56,17 @@
 
         a:visited {
             color: rgb(193, 174, 255);
+        }
+
+        .list {
+            width: min(93%, 50ch);
+            align-self: center;
+            align-items: start;
+        }
+
+        li {
+            text-align: left;
+            padding-bottom: 0.5em;
         }
 
         .socials {
@@ -76,6 +92,17 @@
             position: absolute;
             animation: ymove 11s infinite linear, xmove 8.85s infinite linear, rainbow 8s infinite linear;
             opacity: 0.5
+        }
+
+        #canvas {
+            position: absolute;
+            z-index: -1;
+            width: 100vw;
+            height: 100vh;
+            margin: 0px;
+            padding: 0px;
+            top: 0px;
+            left: 0px;
         }
 
         @keyframes ymove {
@@ -129,31 +156,41 @@
 
         /* Handle */
         ::-webkit-scrollbar-thumb {
-        background: rgb(167, 166, 166);
+        background: rgba(255, 255, 255, 0.2);
         border-radius: 6px;
         transition-duration: 0.3s;
         }
 
         /* Handle on hover */
         ::-webkit-scrollbar-thumb:hover {
-        background: rgb(99, 99, 99);
+        background: rgba(255, 255, 255, 0.3);
         transition-duration: 0.3s;
         }
 
 
     </style>
 </head>
+<canvas id="canvas"></canvas>
 <body>
     <h1>WTF is this?!</h1>
 
-    <p>Peterholl game is an in-development arcade shooter written in vanilla JavaScript, HTML CSS and PHP. The leaderboard on the title screen is global and tracks all games played. Player profiles are a WIP with the goal of being able to click on a player name to see their stats. <br><br> This page is purely for SEO there is nothing useful here.</p>
-    <p style="display: none">peter holl peterholl shooter game peterholl game peterholl peter holl peter holl peterholl game peterholl game peterholl game peterholl game peterholl game peterholl game </p>
+    <p>Unnamed arcade game is an in-development arcade shooter written in vanilla JavaScript, HTML CSS and PHP. The leaderboard on the title screen is <i>global</i> and tracks all games played. The game is currently semi-functional as most server-side logic needs to be updated for the stack AWS uses.<br> </p>
+    <div class="list">
+        <p style="text-align: left;">Changelog (ANAL Build v0.2):</p>
+        <ul>
+            <li>Scores now save</li>
+            <li>Rank calculation fucking works again</li>
+            <li>Logging in is now somehow functional</li>
+            <li>Registering accounts actually goes into the db </li>
+            <li>UI formatting on high DPI displays is still dogshit</li>
+        </ul>
+    </div>
 
-    <h3><a href="">Take me back!!</a></h3>
+    <br>
 
     <h2>F.A.Q.</h2>
 
-    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">What is peterholl?</a>
+    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">How can I get rich quick?</a>
 
     <br><br>
 
@@ -167,18 +204,24 @@
 
     <a href="https://github.com/TRGRally/Arcade-Shooter">How can I contribute to the source code?</a>
 
-    <br><br><br>
+    <br><br>
+
+    <h3><a href="https://www.trgrally.dev">Take me back!!</a></h3>
+
+    <br>
 
     <div class="socials">
 
         <img class="icon" id="discord" src="../images/Discord.svg" alt="Discord" width="90" height="90"></img>
 
-        <img class="icon" id="steam" src="../images/Steam.svg" alt="Steam" width="90" height="90"></img>
+        <img class="icon" id="steam" src="../images/steam.svg" alt="Steam" width="90" height="90"></img>
 
     </div>
 
     <img id="dvd" src="./images/DVD_logo.png" alt="DVD logo bouncing around the screen" width="140" height="90"></img>
     
-
+    <footer>
+        <p>This page is mostly for SEO, there is nothing useful here yet.</p>
+    </footer>
 </body>
 </html>

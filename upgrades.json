@@ -1,31 +1,31 @@
 {
     "upgrades": [
         {
-            "name": "stat_maxHealth_up",
+            "name": "maxHealth_up",
             "type": "stat",
             "description": "MAX HEALTH UP",
             "cost": 10
         },
         {
-            "name": "stat_damage_up",
+            "name": "damage_up",
             "type": "stat",
             "description": "DAMAGE UP",
             "cost": 10
         },
         {
-            "name": "stat_shotRate_up",
+            "name": "shotRate_up",
             "type": "stat",
             "description": "SHOT RATE UP",
             "cost": 10
         },
         {
-            "name": "stat_bulletSpeed_up",
+            "name": "bulletSpeed_up",
             "type": "stat",
             "description": "BULLET SPEED UP",
             "cost": 10
         },
         {
-            "name": "stat_speed_up",
+            "name": "moveSpeed_up",
             "type": "stat",
             "description": "MOVE SPEED UP",
             "cost": 10

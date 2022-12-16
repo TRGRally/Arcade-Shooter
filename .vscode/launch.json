@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "chrome",
+            "name": "trgrally.dev",
+            "request": "launch",
+            "url": "https://trgrally.dev"
+        }
+    ]
+}
