@@ -19,6 +19,7 @@ let waveTrigger = false
 let goingToProfile = false
 let animStart
 let upgrades
+let upgradeBought = false
 let upgradesGenerated = false
 var bgColor = "rgba(26, 25, 23, 1)"
 //running js and parsing canvas
@@ -189,7 +190,7 @@ function determineRank() {
 		
 		setTimeout(
 			() => current.scrollIntoView({block: "start", behavior: "smooth"})
-		, 1200)
+		, 900)
 	} else {
 		console.log("score data not retrieved... are you connected to the internet?")
 	}
@@ -230,8 +231,6 @@ function resolveCollision(o1, o2) { //collision handler, passes 2 objects in wit
 		o2.yvel = o2FinalYVel
 	}
 }
-
-
 
 
 
@@ -364,6 +363,60 @@ class Client {
 }
 
 
+//Wrapper for the javascript setTimeout function which allows for easy pausing and resuming of the timer
+class Timer {
+	constructor(callback, delay) {
+		this.callback = callback
+		this.delay = delay
+		this.timerId = null
+		this.start = null
+		this.remaining = delay
+		this.paused = false
+		this.resume = false
+		this.running = false
+		//many more attributes here than necessary but it makes checking the state easier
+	}
+
+	pause() {
+		if (this.running === true) {
+			this.paused = true
+			this.running = false
+			window.clearTimeout(this.timerId)
+			this.remaining -= new Date() - this.start
+		}
+	}
+
+	resume() {
+		if (this.paused === true) {
+			this.resume = true
+			this.paused = false
+			this.start = new Date()
+			window.clearTimeout(this.timerId)
+			this.timerId = window.setTimeout(this.callback, this.remaining)
+		}
+	}
+
+	start() {
+		if (this.running === false) {
+			this.running = true
+			this.start = new Date()
+			this.timerId = window.setTimeout(this.callback, this.remaining)
+		}
+	}
+
+	stop() {
+		this.running = false
+		this.paused = false
+		this.resume = false
+		window.clearTimeout(this.timerId)
+		this.remaining = this.delay
+	}
+}
+
+
+
+
+
 //defining classes
 class Player { //player template
 	constructor(x, y, radius, color, xvel, yvel) {
@@ -378,7 +431,8 @@ class Player { //player template
 		this.shotDamage = 50
 		this.bulletSpeed = 8
 		this.shotRate = 3
-		this.movementAcceleration = 0.06
+		this.acceleration = 0.06
+		this.speedCap = 10
 		this.shotInterval = 1000 / this.shotRate
 		this.lastShot = 0
 		this.shotsfired = 0
@@ -424,13 +478,23 @@ class Player { //player template
 		}
 	}
 
-	applyUpgrade(upgrade) { //takes upgrade object and applies it to player
+	applyUpgrade(upgrade) { //takes upgrade object and applies it to player, providing they have enough coins
+		if (upgrade == "heal") {
+			this.health = this.maxHealth
+			console.log("healed", this.health, this.maxHealth)
+			return true
+		}
+		if (this.coins < upgrade.cost) {
+			return false
+		}
 		if (upgrade.type === "stat") {
-			this.maxHealth = this.maxhealth + upgrade.maxHealth
-			this.shotDamage = this.shotDamage + upgrade.shotDamage
-			this.bulletSpeed = this.bulletSpeed + upgrade.bulletSpeed
-			this.shotRate = this.shotRate + upgrade.shotRate
-			this.movementAcceleration = this.movementAcceleration + upgrade.movementAcceleration
+			this.maxHealth = (this.maxhealth + upgrade.maxHealth) || this.maxHealth
+			this.shotDamage = (this.shotDamage + upgrade.shotDamage) || this.shotDamage
+			this.bulletSpeed = (this.bulletSpeed + upgrade.bulletSpeed) || this.bulletSpeed
+			this.shotRate = (this.shotRate + upgrade.shotRate) || this.shotRate
+			this.acceleration = (this.acceleration + upgrade.acceleration) || this.acceleration
+			this.speedCap = (this.speedCap + upgrade.speedCap) || this.speedCap
+			this.shotInterval = 1000 / this.shotRate
 		}
 		if (upgrade.type === "heal") {
 			this.health = this.maxHealth
@@ -438,26 +502,30 @@ class Player { //player template
 		if (upgrade.type === "weapon") {
 			this.weapon = upgrade.weapon
 		}
+		this.coins = this.coins - upgrade.cost
+		this.upgrades.push(upgrade)
+		console.table(this.maxHealth, this.shotDamage, this.bulletSpeed, this.shotRate, this.acceleration, this.speedCap, this.coins, this.weapon)
+		return true
 	}
 
 	movement() { //WASD
-		if (W == true && this.yvel > -speedCap) {
-			this.yvel = this.yvel - (this.movementAcceleration * dt)
+		if (W == true && this.yvel > -this.speedCap) {
+			this.yvel = this.yvel - (this.acceleration * dt)
 		}
-		if (A == true && this.xvel > -speedCap) {
-			this.xvel = this.xvel - (this.movementAcceleration * dt)
+		if (A == true && this.xvel > -this.speedCap) {
+			this.xvel = this.xvel - (this.acceleration * dt)
 		}
-		if (S == true && this.yvel < speedCap) {
-			this.yvel = this.yvel + (this.movementAcceleration * dt)
+		if (S == true && this.yvel < this.speedCap) {
+			this.yvel = this.yvel + (this.acceleration * dt)
 		}
-		if (D == true && this.xvel < speedCap) {
-			this.xvel = this.xvel + (this.movementAcceleration * dt)
+		if (D == true && this.xvel < this.speedCap) {
+			this.xvel = this.xvel + (this.acceleration * dt)
 		}
 		//if velocity is negligible, set to 0 - saves computation
-		if (this.xvel > -0.008 && this.xvel < 0.008){
+		if (this.xvel > -0.008 && this.xvel < 0.008 && this.xvel != 0){
 			this.xvel = 0
 		}
-		if (this.yvel > -0.008 && this.yvel < 0.008){
+		if (this.yvel > -0.008 && this.yvel < 0.008 && this.xvel != 0){
 			this.yvel = 0
 		}
 	}
@@ -607,7 +675,8 @@ class CharacterShowcase {
 		this.color = color
 		this.xvel = 0
 		this.yvel = 0
-		this.gun = new Gun(pc, this, this.radius + 35, 30, "rgb(255,255,255)")
+		this.gun = new Gun(pc, this, this.radius + 80, 90, "rgb(255,255,255)")
+		this.gun.angle = 2 * Math.PI
 	}
 
 
@@ -626,14 +695,15 @@ class CharacterShowcase {
 	}
 
 	update() { //calls draw and changes coords based on velocity - ease of use function
-		let R = document.getElementById("colorR").value
-		let G = document.getElementById("colorG").value
-		let B = document.getElementById("colorB").value
-		this.color = "rgb(" + R + "," + G + "," + B + ")"
+
+		
+		this.color = document.getElementById("color1Picker").value
+		this.gun.color = document.getElementById("color2Picker").value
+		this.gun.draw()
 		this.draw()
 		this.y = this.y + this.yvel * dt
 		this.x = this.x + this.xvel * dt
-		this.gun.update()
+		
 	}
 
 }
@@ -1008,6 +1078,11 @@ function gameplayLoop() {
 	requestAnimationFrame(gameplayLoop) //queue next frame
 
 	if (gameState === "playing") { //GAMEPLAY STATE
+		if (client.auth === true) {
+			client.update()
+			client.shotsfired = player.shotsfired
+			console.table(client)
+		}
 		//player movement logic
 		player.worldBorderCollision()
 		player.friction()
@@ -1120,11 +1195,13 @@ function gameplayLoop() {
 		if (enemies.length === 0 && waveTrigger === false) { //if all enemies dead (number in the list = number killed), spawn next wave in 2.5s
 			waveTrigger = true
 			enemyCount = enemyCount + 1 //increase enemy count for next wave
-			if (waveCount % 500 == 0 && waveCount != 0) { //every 5 waves, show the shop
-				setTimeout(() => {
+			if (waveCount % 5 == 0 && waveCount != 0 && player.name === "dev") { //every 5 waves, show the shop
+				shopTimer = new Timer(() => {
 					upgradesGenerated = false
 					gameState = "shop"
+					shopTimer.stop()
 				}, 1750)
+				shopTimer.start()
 			} else {
 				setTimeout(SpawnWave, 2500, enemyCount, 100)
 			}	
@@ -1246,7 +1323,7 @@ function gameplayLoop() {
 		
 		
 		
-			//client.submitStats()
+			client.submitStats()
 
 
 		
@@ -1330,6 +1407,7 @@ function gameplayLoop() {
 			document.getElementById("upgrade2Cost").innerHTML = client.upgrade2.cost + " COINS"
 			document.getElementById("upgrade2Icon").src = `../images/${client.upgrade2.name}.svg`
 			document.getElementById("upgrade2Icon").alt = `${client.upgrade2.name}`
+
 			
 		}
 		
@@ -1510,7 +1588,7 @@ profileButton.addEventListener("click", () => {
 		menuState = "profile"
 	}
 	playSoundEffect("/ui/button", 1)
-	character = new CharacterShowcase(100, "rgb(0,255,255)")
+	character = new CharacterShowcase(128, "rgb(0,255,255)")
 })
 
 
@@ -1614,13 +1692,12 @@ returnToMenu.addEventListener("click", () => {
 const upgrade1Hitbox = document.getElementById("upgrade1Hitbox") 
 const upgrade1 = document.getElementById("upgrade1Panel")
 upgrade1Hitbox.addEventListener("click", () => {
-	if (player.coins >= client.upgrade1.cost) {
-		player.coins -= client.upgrade1.cost
-		player.applyUpgrade(client.upgrade1)
+	if (player.applyUpgrade(client.upgrade1)) {
 		playSoundEffect("/ui/button", 1)
 		upgrade2.style.animation = "disappearToBottom 0.3s ease-in-out"
 		heal.style.animation = "disappearToBottom 0.3s ease-in-out"
 		setTimeout(() => {
+			setTimeout(SpawnWave, 1500, enemyCount, 100)
 			gameState = "playing"
 		}, 300)
 	} else {
@@ -1633,14 +1710,13 @@ upgrade1Hitbox.addEventListener("click", () => {
 const upgrade2Hitbox = document.getElementById("upgrade2Hitbox") 
 const upgrade2 = document.getElementById("upgrade2Panel")
 upgrade2Hitbox.addEventListener("click", () => {
-	if (player.coins >= client.upgrade2.cost) {
-		player.coins -= client.upgrade2.cost
-		player.applyUpgrade(client.upgrade2)
+	if (player.applyUpgrade(client.upgrade2)) {
 		playSoundEffect("/ui/button", 1)
 		console.log("upgrade2 applied")
 		upgrade1.style.animation = "disappearToBottom 0.3s ease-in-out"
 		heal.style.animation = "disappearToBottom 0.3s ease-in-out"
 		setTimeout(() => {
+			setTimeout(SpawnWave, 1500, enemyCount, 100)
 			gameState = "playing"
 		}, 300)
 	} else {
@@ -1657,18 +1733,39 @@ healHitbox.addEventListener("click", () => {
 	upgrade1.style.animation = "disappearToBottom 0.3s ease-in-out"
 	upgrade2.style.animation = "disappearToBottom 0.3s ease-in-out"
 	setTimeout(() => {
+		setTimeout(SpawnWave, 1500, enemyCount, 100)
 		gameState = "playing"
 	}, 300)
-	
+	player.applyUpgrade("heal")
 	console.log("clicked heal")
 
 })
 
 
+//PAUSE MENU BUTTONS
+
+//resume button
+const resumeButton = document.getElementById("resume")
+resumeButton.addEventListener("click", () => {
+	playSoundEffect("/ui/button", 1)
+	gameState = "playing"
+})
+
+//save and exit button
+const quitButton = document.getElementById("quit")
+quitButton.addEventListener("click", () => {
+	playSoundEffect("/ui/button", 1)
+	gameState = "title screen"
+	menuState = "titles"
+	resetValues()
+})
+
+
+
 //all buttons hover noise
 document.addEventListener("mouseover", (event) => {
 	if (event.target.matches(".button") || event.target.matches(".sidebutton") || event.target.matches(".upgradeHitbox")) {
-	  // one of our buttons was clicked
+	  // one of the buttons was clicked
 	  const button = event.target
 	  playSoundEffect("/ui/button_hover", 0.2)
 	}
@@ -1703,6 +1800,8 @@ document.addEventListener("mouseout", (event) => {
 
 
 async function submitScore(){ //AJAX REQUEST: creates server POST request to store the player's score and name into the database
+	if (player.name === "dev") return
+	
 	var params = "name=" + player.name + "&" + "score=" + player.score //format params for the POST request
 	var request = new XMLHttpRequest() //create new request
 	request.open("POST", "../php/submitScore.php", true) //set to POST request, call php file
@@ -1879,9 +1978,10 @@ function resetValues() { //prepare new game by resetting values
 }
 
 function init() { //called on startup - make sure menu is correct
+	client = new Client()
 	gameState = "title screen"
 	menuState = "titles"
-	client = new Client()
+	
 	getUpgrades()
 }
 //startup

@@ -4,3 +4,4 @@ fastdl/
 users.db
 usage.db
 *.zip
+*.sql

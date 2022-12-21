@@ -4,31 +4,37 @@
             "name": "maxHealth_up",
             "type": "stat",
             "description": "MAX HEALTH UP",
-            "cost": 10
+            "cost": 10,
+            "maxHealth": 50
         },
         {
             "name": "damage_up",
             "type": "stat",
             "description": "DAMAGE UP",
-            "cost": 10
+            "cost": 10,
+            "shotDamage": 40
         },
         {
             "name": "shotRate_up",
             "type": "stat",
             "description": "SHOT RATE UP",
-            "cost": 10
+            "cost": 10,
+            "shotRate": 1
         },
         {
             "name": "bulletSpeed_up",
             "type": "stat",
             "description": "BULLET SPEED UP",
-            "cost": 10
+            "cost": 10,
+            "bulletSpeed": 2
         },
         {
             "name": "moveSpeed_up",
             "type": "stat",
             "description": "MOVE SPEED UP",
-            "cost": 10
+            "cost": 10,
+            "moveSpeed": 0.5,
+            "acceleration": 0.03
         }
     ]
 }

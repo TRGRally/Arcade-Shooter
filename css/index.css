@@ -114,26 +114,63 @@ html, body, #gameOverLeaderboard {
 #paused {
    display: grid;
    grid-template-areas:
-      "topleft top topright"
-      "midleft middle middleright"
-      "bottomleft bottom bottomright";
+      "paused"
+      "resume"
+      "options"
+      "quit";
    align-items: center;
    justify-items: center;
    vertical-align: middle;
-   height: 100vh;
-   grid-template-columns: 1fr 4fr 1fr;
-   grid-template-rows: 1fr 4fr 1fr;
+   height: 50vh;
+   width: 50vw;
+   margin-left: auto;
+   margin-right: auto;
+   padding-top: 20vh;
+   grid-template-rows: 12em 8em 8em 8em;
    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.5); /* GLOW */
 }
 
 #pausedText {
    position: relative;
-   display: grid;
    color: white;
    font-size: 100px;
-   grid-area: middle;
+   grid-area: paused;
+   padding-left: 0.2em;
+   padding-right: 0.2em;
 }
 
+#resume {
+   grid-area: resume;
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+   align-content: center;
+   font-size: 4em;
+   width: min(calc(100% -2em), 8em);
+   height: calc(100% - 0.5em);
+}
+
+#pauseOptions {
+   grid-area: options;
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+   align-content: center;
+   font-size: 4em;
+   width: min(calc(100% - 2em), 8em);
+   height: calc(100% - 0.5em);
+}
+
+#quit {
+   grid-area: quit;
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+   align-content: center;
+   font-size: 4em;
+   width: min(calc(100% - 2em), 8em);
+   height: calc(100% - 0.5em);
+}
 /* SHOP UI BELOW */
 
 #shop {
@@ -290,6 +327,8 @@ html, body, #gameOverLeaderboard {
    padding-top: 1rem;
 }
 
+
+
 #githubButton {
    padding-bottom: 10px;
 }
@@ -301,6 +340,7 @@ html, body, #gameOverLeaderboard {
 .siderbar-item img {
    min-width: 2rem;
    max-width: 95%;
+   z-index: -1;
 }
 
 .button-text {
@@ -485,7 +525,7 @@ td {
    vertical-align: center;
    top: 1em;
    left: 1em;
-   height: calc(100vh - 2em);
+   max-height: calc(100vh - 2em);
    width: calc(100vw - 2em);
    grid-gap: 1em;
    grid-template-areas:
@@ -519,7 +559,7 @@ td {
 }
 
 #profileStats {
-   position: relative;
+   position: absolute;
    grid-area: stats;
    width: 100%;
    height: 100%;
@@ -546,39 +586,64 @@ td {
    height: 100%;
    align-items: center;
    grid-template-areas: 
-      "highscore highscoreNumber"
-      "highwave highwaveNumber"
-      "games gamesNumber"
-      "shots shotsNumber";
+      "sep1"
+      "highscore"
+      "sep2"
+      "highwave"
+      "sep3"
+      "games"
+      "sep4"
+      "shots"
+      "sep5";
+   grid-template-rows: 0.25fr 1fr 0.25fr 1fr 0.25fr 1fr 0.25fr 1fr 0.25fr;
+}
+
+hr {
+   width: calc(100% - 2em);
+   height: 1px;
+   background-color: rgba(255, 255, 255, 0.5);
+   justify-self: center;
+   align-self: center;
+   border: none;
 }
 
 .stat {
    font-size: 2em;
    text-align: center; 
+   justify-self: left;
+   padding-left: 0.5em;
+
+}
+
+.statNumber {
+   font-size: 2em;
+   text-align: center; 
+   justify-self: right;
+   padding-right: 0.5em;
 }
 
 #profileCustomisation {
-   position: relative;
+   position: absolute;
    grid-area: customisation;
    width: 100%;
    height: 100%;
    border-radius: 8px;
    display: grid;
    grid-template-areas:
-      "title title"
-      "showcase color";
-   grid-template-rows: 1fr 6fr;
+      "title"
+      "showcase"
+      "color";
+   grid-template-rows: 1fr 6fr 3fr;
 }
 
 #profileColorContainer {
    grid-area: color;
    display: grid;
    grid-template-areas:
-      "title"
-      "R"
-      "G"
-      "B";
-   grid-template-rows: auto;
+      "title1 title2 applylabel"
+      "color1 color2 apply";
+   grid-template-rows: 1fr 1fr;
+   height: 50%;
    align-items: center;
    justify-items: center;
 }
@@ -589,19 +654,39 @@ td {
    font-size: 2rem;
 }
 
-#colorR {
-   grid-area: R;
-   transform: scale(0.8);
+label {
+   font-size: 2em;
 }
 
-#colorG {
-   grid-area: G;
-   transform: scale(0.8);
+input[type="color" i] {
+   border: none;
 }
 
-#colorB {
-   grid-area: B;
-   transform: scale(0.8);
+
+
+.colorpicker {
+   -webkit-appearance: none;
+   -moz-appearance: none;
+   appearance: none;
+   border: solid white, 4px;
+   border-radius: 8px;
+   width: 8em;
+   height: 8em;
+   background-color: white;
+   cursor: pointer;
+   padding: none;
+}
+
+.colorpicker::-webkit-color-swatch {
+   border-radius: 8px;
+   border: solid white, 4px;
+   padding: none;
+}
+
+.colorpicker::-moz-color-swatch {
+   border-radius: 8px;
+   border: solid white, 4px;
+   padding: none;
 }
 
 #profileCustomisationTitle {
@@ -629,9 +714,10 @@ td {
 #profileCharacter {
    grid-area: character;
    align-self: start;
-   width: 80%;
+   width: min(calc(100% - 2em), 20vw);
    height: auto;
    justify-self: center;
+   align-self: center;
 }
 
 
@@ -1024,7 +1110,7 @@ td {
 
 .button {
    border-radius: 8px;
-   background-color: rgba(255, 255, 255, 0);
+   background-color: rgba(255, 255, 255, 0.1);
    transition-duration: 0.1s;
    transform: scale(1);
 }
@@ -1049,7 +1135,6 @@ td {
 }
 
 .sidebutton:hover {
-   font-weight: 400;
    text-shadow: 0px 0px 15px rgba(255, 255, 255, 0.747);
    transition-duration: 0.1s;
    transform: scale(0.95);

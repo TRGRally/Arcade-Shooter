@@ -48,6 +48,9 @@
 	<!--PAUSE MENU-->
 	<div id="paused">
 		<div id="pausedText">PAUSED</div>
+		<div id="resume" class="button">RESUME</div>
+		<div id="pauseOptions" class="button">OPTIONS</div>
+		<div id="quit" class="button">SAVE & QUIT</div>
 	</div>
 
 	<div id="HUD">
@@ -93,7 +96,7 @@
 			<input id="nameBox" class="textinput" type="text" placeholder="Guest" autocomplete="off" spellcheck="false" autofocus="true" maxLength="16">
 		</div>
 		
-		<div id="loggedInAs" class="title tooltip">ANAL build v0.1 (semi-functional)</div>
+		<div id="loggedInAs" class="title tooltip">ANAL build v0.2 (mostly-functional)</div>
 		<div id="gameTitle" class="title">UNNAMED ARCADE GAME</div>
 		<div id="leaderboard">
 			<div id="leaderboardTitle" class="title" >LEADERBOARD</div>
@@ -178,14 +181,19 @@
 		<div id="profileStats" class="uipanel">
 			<div id="profileStatsTitle">STATS</div>
 			<div id="profileStatsSection">
+				<hr style="grid-area: sep1">
 				<div id="profileHighScore" class="stat" style="grid-area: highscore">Highest score</div>
-				<div id="profileHighScoreNumber" class="stat" style="grid-area: highscoreNumber">9999</div>
+				<div id="profileHighScoreNumber" class="statNumber" style="grid-area: highscore">9999</div>
+				<hr style="grid-area: sep2">
 				<div id="profileGames" class="stat" style="grid-area: games">Games played</div>
-				<div id="profileGamesNumber" class="stat" style="grid-area: gamesNumber">99</div>
+				<div id="profileGamesNumber" class="statNumber" style="grid-area: games">99</div>
+				<hr style="grid-area: sep3">
 				<div id="profileShots" class="stat" style="grid-area: shots">Shots fired</div>
-				<div id="profileShotsNumber" class="stat" style="grid-area: shotsNumber">99999</div>
+				<div id="profileShotsNumber" class="statNumber" style="grid-area: shots">99999</div>
+				<hr style="grid-area: sep4">
 				<div id="profileHighWave" class="stat" style="grid-area: highwave">Highest wave</div>
-				<div id="profileHighWaveNumber" class="stat" style="grid-area: highwaveNumber">99</div>
+				<div id="profileHighWaveNumber" class="statNumber" style="grid-area: highwave">99</div>
+				<hr style="grid-area: sep5">
 			</div>
 		</div>
 		<div id="profileCustomisation" class="uipanel">
@@ -195,10 +203,12 @@
 				<div id="profileName">Username</div>
 			</div>
 			<div id="profileColorContainer">
-				<div id="profileColorTitle">Colour</div>
-				<input id="colorR" type="range" min="0" max="255" value="80" class="slider">
-				<input id="colorG" type="range" min="0" max="255" value="30" class="slider">
-				<input id="colorB" type="range" min="0" max="255" value="255" class="slider">
+				<input type="color" id="color1Picker" class="colorpicker" value="#3F9BD6" style="grid-area: color1;">
+				<input type="color" id="color2Picker" class="colorpicker" value="#FFFFFF" style="grid-area: color2;"">
+				<i id="apply" class="fa-regular fa-square-check button" style="grid-area: apply; font-size: 7em; background-color: transparent"></i>
+				<label id="profileColor1Title" for="color1Picker" style="grid-area: title1;">Character</label>
+				<label id="profileColor2Title" for="color2Picker" style="grid-area: title2;">Gun</label>
+				<label id="profileApplyLabel" for="apply" style="grid-area: applylabel;">Apply</label>
 			</div>
 		</div>
 	</div>
